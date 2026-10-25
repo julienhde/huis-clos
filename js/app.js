@@ -14,7 +14,8 @@ const store = {
   },
 };
 
-const emptyState = () => ({ place: {}, marks: [], struck: [], solved: false });
+// notes : annotations au crayon, { "r,c": [ids] }. Ignorées par « Vérifier ».
+const emptyState = () => ({ place: {}, marks: [], notes: {}, struck: [], solved: false });
 
 // ---------- État de l'application ----------
 let catalog = [];          // [{ id, file, puzzle }]
@@ -22,6 +23,7 @@ let g = null;              // grille compilée en cours
 let state = emptyState();
 let history = [];
 let tool = null;           // id de personne, 'x' ou 'erase'
+let noting = false;        // interrupteur « Annoter » : les appuis écrivent des initiales au crayon
 let resetArmed = false;
 let options = { shade: true, theme: 'auto', ...store.get('hc:options', {}) };
 
@@ -46,7 +48,7 @@ function progressOf(id) {
   const s = store.get(`hc:case:${id}`, null);
   if (!s) return 'new';
   if (s.solved) return 'done';
-  return Object.keys(s.place).length || s.marks.length ? 'progress' : 'new';
+  return Object.keys(s.place).length || s.marks.length || Object.keys(s.notes ?? {}).length ? 'progress' : 'new';
 }
 
 // ---------- Accueil ----------
@@ -79,6 +81,7 @@ function openCase(id) {
   state = { ...emptyState(), ...store.get(`hc:case:${id}`, {}) };
   history = [];
   tool = g.people.find(p => !state.place[p.id])?.id ?? null;
+  noting = false;
   resetArmed = false;
 
   $('#case-no').textContent = `Affaire n° ${id} · ${g.difficulty}`;
@@ -190,6 +193,7 @@ function renderTools() {
   for (const btn of document.querySelectorAll('.chip.tool')) {
     btn.setAttribute('aria-pressed', tool === btn.dataset.tool);
   }
+  $('#tool-note').setAttribute('aria-pressed', noting);
 }
 
 const X_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5 Q12 11 19 18.5 M18.5 5 Q12 12.5 5.5 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
@@ -215,6 +219,9 @@ function renderBoard(popKey = null, nopeKey = null) {
     colCount[c] = (colCount[c] ?? 0) + 1;
   }
   const marks = new Set(state.marks);
+  // Chaque personne a sa place fixe dans la case, comme les annotations d'un sudoku.
+  const side = Math.ceil(Math.sqrt(g.people.length));
+  board.style.setProperty('--nside', side);
   const floors = g.rooms.map(floorFor);
 
   // Axes.
@@ -297,11 +304,25 @@ function renderBoard(popKey = null, nopeKey = null) {
         m.innerHTML = X_SVG;
         btn.append(m);
       }
+      const noted = who ? [] : (state.notes[k] ?? []);
+      if (noted.length) {
+        const box = Object.assign(document.createElement('span'), { className: 'notes' });
+        for (const id of noted) {
+          const i = g.people.findIndex(p => p.id === id);
+          const n = Object.assign(document.createElement('span'), { className: 'note', textContent: g.byId[id].name[0] });
+          n.style.setProperty('--ph', g.byId[id].hue);
+          n.style.gridRow = `${Math.floor(i / side) + 1}`;
+          n.style.gridColumn = `${(i % side) + 1}`;
+          box.append(n);
+        }
+        btn.append(box);
+      }
 
       const parts = [`${LETTERS[c]}${r + 1}`, g.rooms[room].name, ...objs.map(t => g.types[t].label)];
       if (g.windowCells.has(k)) parts.push('devant une fenêtre');
       if (who) parts.push(g.byId[who].name);
       else if (marks.has(k)) parts.push('barrée');
+      if (noted.length) parts.push(`annoté ${noted.map(id => g.byId[id].name).join(', ')}`);
       btn.setAttribute('aria-label', parts.join(', '));
       btn.addEventListener('click', () => onCell(r, c));
       els.push(btn);
@@ -363,21 +384,43 @@ function save() {
   store.set(`hc:case:${g.id}`, state);
 }
 
+const whoAt = (r, c) => Object.entries(state.place).find(([, [rr, cc]]) => rr === r && cc === c)?.[0];
+
+/** Ajoute ou retire l'initiale d'une personne au crayon dans une case. */
+function toggleNote(r, c) {
+  const k = cellKey(r, c);
+  if (!tool || tool === 'x' || tool === 'erase') { setStatus('Choisis d’abord la personne à annoter.', 'bad'); return; }
+  if (!g.occupiable(r, c) || whoAt(r, c)) { renderBoard(null, k); return; }
+  disarmReset();
+  snapshot();
+  const list = state.notes[k] ?? [];
+  const next = list.includes(tool) ? list.filter(id => id !== tool) : [...list, tool];
+  if (next.length) state.notes[k] = next; else delete state.notes[k];
+  state.marks = state.marks.filter(x => x !== k);
+  save();
+  setStatus('');
+  renderBoard();
+}
+
 function onCell(r, c) {
   if (!tool) { setStatus('Choisis d’abord une personne, Barrer ou Gomme.', 'bad'); return; }
   const k = cellKey(r, c);
-  const who = Object.entries(state.place).find(([, [rr, cc]]) => rr === r && cc === c)?.[0];
+  const who = whoAt(r, c);
+  const isPerson = tool !== 'x' && tool !== 'erase';
+  if (isPerson && noting) return toggleNote(r, c);
   disarmReset();
 
   if (tool === 'x') {
     if (who) return;
     snapshot();
     state.marks = state.marks.includes(k) ? state.marks.filter(x => x !== k) : [...state.marks, k];
+    delete state.notes[k];
   } else if (tool === 'erase') {
-    if (!who && !state.marks.includes(k)) return;
+    if (!who && !state.marks.includes(k) && !state.notes[k]) return;
     snapshot();
     if (who) delete state.place[who];
     state.marks = state.marks.filter(x => x !== k);
+    delete state.notes[k];
   } else {
     if (!g.occupiable(r, c)) {
       const t = (g.objectsAt.get(k) ?? []).find(t => !g.types[t].occupiable);
@@ -392,6 +435,8 @@ function onCell(r, c) {
       if (who) delete state.place[who];
       state.place[tool] = [r, c];
       state.marks = state.marks.filter(x => x !== k);
+      const left = (state.notes[k] ?? []).filter(id => id !== tool);
+      if (left.length) state.notes[k] = left; else delete state.notes[k];
     }
   }
   save();
@@ -443,6 +488,12 @@ $('#verdict-close').addEventListener('click', () => { location.hash = ''; });
 for (const btn of document.querySelectorAll('.chip.tool')) {
   btn.addEventListener('click', () => { tool = btn.dataset.tool; renderTools(); });
 }
+
+$('#tool-note').addEventListener('click', () => {
+  noting = !noting;
+  if (noting && (tool === 'x' || tool === 'erase')) tool = g.people.find(p => !state.place[p.id])?.id ?? g.people[0].id;
+  renderTools();
+});
 
 $('#undo').addEventListener('click', () => {
   disarmReset();

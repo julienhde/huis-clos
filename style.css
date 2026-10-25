@@ -330,6 +330,19 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px 
 }
 .mark svg { width: 100%; height: 100%; display: block; }
 
+/* Annotations au crayon : une initiale par personne, toujours au même endroit de la case. */
+.notes {
+  position: absolute; z-index: 3; inset: 6%;
+  display: grid; grid-template: repeat(var(--nside), 1fr) / repeat(var(--nside), 1fr);
+  pointer-events: none;
+}
+.note {
+  display: grid; place-items: center;
+  color: hsl(var(--ph) 70% 34%);
+  font: 700 calc(min(100vw - 56px, 520px) / var(--cols) / var(--nside) * .62)/1 var(--font-body);
+  text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff;
+}
+
 .cell.pop .token { animation: pop .18s ease-out; }
 @keyframes pop { from { transform: scale(.6); } to { transform: scale(1); } }
 .cell.nope { animation: nope .28s; }
@@ -355,6 +368,9 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px 
 .chip.placed .dot { opacity: .55; }
 .chip.tool { padding-left: 12px; }
 .x-glyph { color: var(--red); font-weight: 700; }
+.chip.note-switch { padding-left: 12px; border-style: dashed; }
+.chip.note-switch[aria-pressed="true"] { border-style: solid; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.note-hint { margin: 0; font-size: 13px; color: var(--muted); }
 
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .btn {
