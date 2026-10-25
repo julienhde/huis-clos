@@ -343,6 +343,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px 
   text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff;
 }
 
+.cell { -webkit-touch-callout: none; }
 .cell.pop .token { animation: pop .18s ease-out; }
 @keyframes pop { from { transform: scale(.6); } to { transform: scale(1); } }
 .cell.nope { animation: nope .28s; }

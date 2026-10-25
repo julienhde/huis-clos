@@ -24,8 +24,18 @@ let state = emptyState();
 let history = [];
 let tool = null;           // id de personne, 'x' ou 'erase'
 let noting = false;        // interrupteur « Annoter » : les appuis écrivent des initiales au crayon
+let holdUntil = 0;         // après un appui long, ignore le clic qui suit
 let resetArmed = false;
 let options = { shade: true, theme: 'auto', ...store.get('hc:options', {}) };
+
+// Essai : tous les joueurs peuvent comparer plusieurs façons d'annoter (réglage en bas de page).
+// On ne gardera que celle qui plaît le plus.
+const NOTE_MODES = {
+  switch: { label: 'Interrupteur « Annoter »', hint: 'Active « Annoter » pour écrire des initiales au crayon.' },
+  hold: { label: 'Appui long', hint: 'Appui long sur une case : initiale au crayon. Appui bref : placer.' },
+  cycle: { label: 'Appuis successifs', hint: 'Chaque appui : initiale au crayon, puis placée, puis effacée.' },
+};
+const noteMode = () => (options.noteMode in NOTE_MODES ? options.noteMode : 'switch');
 
 /** Thème affiché : le choix du joueur, sinon celui de l'affaire, sinon le Manoir. */
 const themeOf = puzzle => (options.theme !== 'auto' && THEMES[options.theme]) ? options.theme : (THEMES[puzzle?.theme] ? puzzle.theme : 'manoir');
@@ -88,6 +98,7 @@ function openCase(id) {
   $('#case-name').textContent = g.title;
   $('#case-intro').textContent = g.intro ?? '';
   $('#opt-shade').checked = options.shade;
+  renderNoteModeSelect();
   renderThemeSelect();
 
   renderLegend();
@@ -193,7 +204,10 @@ function renderTools() {
   for (const btn of document.querySelectorAll('.chip.tool')) {
     btn.setAttribute('aria-pressed', tool === btn.dataset.tool);
   }
-  $('#tool-note').setAttribute('aria-pressed', noting);
+  const note = $('#tool-note');
+  note.hidden = noteMode() !== 'switch';
+  note.setAttribute('aria-pressed', noting);
+  $('#note-hint').textContent = NOTE_MODES[noteMode()].hint;
 }
 
 const X_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5 Q12 11 19 18.5 M18.5 5 Q12 12.5 5.5 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
@@ -324,7 +338,8 @@ function renderBoard(popKey = null, nopeKey = null) {
       else if (marks.has(k)) parts.push('barrée');
       if (noted.length) parts.push(`annoté ${noted.map(id => g.byId[id].name).join(', ')}`);
       btn.setAttribute('aria-label', parts.join(', '));
-      btn.addEventListener('click', () => onCell(r, c));
+      btn.addEventListener('click', () => { if (Date.now() > holdUntil) onCell(r, c); });
+      if (noteMode() === 'hold') holdToNote(btn, r, c);
       els.push(btn);
     }
   }
@@ -402,12 +417,32 @@ function toggleNote(r, c) {
   renderBoard();
 }
 
+/** Mode essai « appui long » : maintenir le doigt sur une case l'annote. */
+function holdToNote(btn, r, c) {
+  let timer = null;
+  const stop = () => { clearTimeout(timer); timer = null; };
+  btn.addEventListener('pointerdown', e => {
+    if (e.button) return;
+    stop();
+    timer = setTimeout(() => {
+      timer = null;
+      holdUntil = Date.now() + 700;
+      navigator.vibrate?.(15);
+      toggleNote(r, c);
+    }, 420);
+  });
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, stop);
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+}
+
 function onCell(r, c) {
   if (!tool) { setStatus('Choisis d’abord une personne, Barrer ou Gomme.', 'bad'); return; }
   const k = cellKey(r, c);
   const who = whoAt(r, c);
   const isPerson = tool !== 'x' && tool !== 'erase';
-  if (isPerson && noting) return toggleNote(r, c);
+  if (isPerson && noteMode() === 'switch' && noting) return toggleNote(r, c);
+  // Mode essai « appuis successifs » : vide → annotée → placée → vide.
+  if (isPerson && noteMode() === 'cycle' && who !== tool && !(state.notes[k] ?? []).includes(tool)) return toggleNote(r, c);
   disarmReset();
 
   if (tool === 'x') {
@@ -537,6 +572,20 @@ $('#reset').addEventListener('click', () => {
   renderTools();
   renderBoard();
   renderClues();
+});
+
+function renderNoteModeSelect() {
+  const sel = $('#opt-notes');
+  sel.replaceChildren(...Object.entries(NOTE_MODES).map(([id, m]) => new Option(m.label, id)));
+  sel.value = noteMode();
+}
+
+$('#opt-notes').addEventListener('change', e => {
+  options.noteMode = e.target.value;
+  noting = false;
+  store.set('hc:options', options);
+  renderTools();
+  renderBoard();
 });
 
 function renderThemeSelect() {

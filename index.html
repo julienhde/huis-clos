@@ -63,7 +63,7 @@
             <button id="tool-erase" class="chip tool" type="button" data-tool="erase" aria-pressed="false"><span aria-hidden="true">⌫</span>Gomme</button>
             <button id="tool-note" class="chip note-switch" type="button" aria-pressed="false"><span aria-hidden="true">✎</span>Annoter</button>
           </div>
-          <p class="note-hint">Active « Annoter » pour écrire des initiales au crayon.</p>
+          <p id="note-hint" class="note-hint"></p>
         </div>
 
         <div class="actions">
@@ -81,6 +81,10 @@
         <label class="option" for="opt-theme">
           Thème
           <select id="opt-theme"></select>
+        </label>
+        <label class="option" for="opt-notes">
+          Annoter par (essai)
+          <select id="opt-notes"></select>
         </label>
         <label class="option" for="opt-shade">
           <input id="opt-shade" type="checkbox" checked>

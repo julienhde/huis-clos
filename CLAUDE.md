@@ -39,6 +39,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 - Choix du thème : réglage du joueur, sinon `"theme"` de l'affaire, sinon `manoir`. Un objet absent d'un thème reprend le dessin du Manoir.
 - Thèmes existants : `manoir`, `chateau`, `cyberpunk`. Idées : post-apo, futuriste, pixel art.
 - La légende des objets reprend les dessins du thème courant.
+- Annotations au crayon (initiales temporaires dans les cases, ignorées par « Vérifier ») : en essai, un réglage « Annoter par » permet à tous de comparer l'interrupteur « Annoter », l'appui long et les appuis successifs. Après les retours, ne garder que la façon retenue. Julien n'est pas encore convaincu : piste d'un petit menu au toucher d'une case.
 - « Huis Clos » est un nom provisoire, choisi pour éviter le nom de la série de livres (probablement une marque).
 
 ## À faire / ouvert
