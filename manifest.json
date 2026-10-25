@@ -1,0 +1,14 @@
+{
+  "name": "Huis Clos",
+  "short_name": "Huis Clos",
+  "description": "Casse-têtes logiques : place les suspects, démasque le coupable.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef2f6",
+  "theme_color": "#eef2f6",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+ "id": "001",
+ "title": "Dîner au manoir",
+ "difficulty": "Facile",
+ "intro": "Le comte Victor a été retrouvé sans vie après le dîner. Cinq invités, quatre pièces, un seul coupable.",
+ "size": 6,
+ "rooms": [
+  {
+   "name": "Chambre",
+   "dans": "dans la chambre",
+   "hue": 210
+  },
+  {
+   "name": "Cuisine",
+   "dans": "dans la cuisine",
+   "hue": 40
+  },
+  {
+   "name": "Bibliothèque",
+   "dans": "dans la bibliothèque",
+   "hue": 140
+  },
+  {
+   "name": "Salle à manger",
+   "dans": "dans la salle à manger",
+   "hue": 340
+  }
+ ],
+ "roomMap": [
+  [
+   0,
+   0,
+   0,
+   1,
+   1,
+   1
+  ],
+  [
+   0,
+   0,
+   0,
+   1,
+   1,
+   1
+  ],
+  [
+   0,
+   0,
+   3,
+   3,
+   1,
+   1
+  ],
+  [
+   2,
+   2,
+   3,
+   3,
+   3,
+   3
+  ],
+  [
+   2,
+   2,
+   3,
+   3,
+   3,
+   3
+  ],
+  [
+   2,
+   2,
+   2,
+   3,
+   3,
+   3
+  ]
+ ],
+ "objects": [
+  {
+   "type": "plante",
+   "cells": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     5
+    ]
+   ]
+  },
+  {
+   "type": "lit",
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  },
+  {
+   "type": "tapis",
+   "cells": [
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     4,
+     1
+    ]
+   ]
+  },
+  {
+   "type": "tv",
+   "cells": [
+    [
+     0,
+     5
+    ]
+   ]
+  },
+  {
+   "type": "table",
+   "cells": [
+    [
+     1,
+     4
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     4
+    ]
+   ]
+  },
+  {
+   "type": "fauteuil",
+   "cells": [
+    [
+     1,
+     3
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     5,
+     0
+    ]
+   ]
+  },
+  {
+   "type": "etagere",
+   "cells": [
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ]
+   ]
+  }
+ ],
+ "victim": "V",
+ "people": [
+  {
+   "id": "A",
+   "name": "Agathe",
+   "g": "f",
+   "hue": 0
+  },
+  {
+   "id": "B",
+   "name": "Bastien",
+   "g": "m",
+   "hue": 30
+  },
+  {
+   "id": "C",
+   "name": "Céline",
+   "g": "f",
+   "hue": 100
+  },
+  {
+   "id": "D",
+   "name": "Damien",
+   "g": "m",
+   "hue": 190
+  },
+  {
+   "id": "E",
+   "name": "Élise",
+   "g": "f",
+   "hue": 270
+  },
+  {
+   "id": "V",
+   "name": "Victor",
+   "g": "m",
+   "hue": 0,
+   "victim": true
+  }
+ ],
+ "clues": [
+  {
+   "who": "A",
+   "type": "only_on",
+   "object": "lit"
+  },
+  {
+   "who": "B",
+   "type": "on",
+   "object": "fauteuil"
+  },
+  {
+   "who": "C",
+   "type": "alone_with",
+   "other": "B"
+  },
+  {
+   "who": "D",
+   "type": "on",
+   "object": "tapis"
+  },
+  {
+   "who": "E",
+   "type": "alone",
+   "room": 3
+  }
+ ],
+ "solution": {
+  "A": [
+   0,
+   2
+  ],
+  "B": [
+   1,
+   3
+  ],
+  "C": [
+   2,
+   4
+  ],
+  "D": [
+   4,
+   1
+  ],
+  "E": [
+   3,
+   5
+  ],
+  "V": [
+   5,
+   0
+  ]
+ },
+ "windows": [
+  {
+   "cell": [
+    2,
+    0
+   ],
+   "side": "w"
+  },
+  {
+   "cell": [
+    5,
+    5
+   ],
+   "side": "s"
+  }
+ ]
+}

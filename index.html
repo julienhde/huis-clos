@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Huis Clos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#eef2f6">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Pirata+One&family=Orbitron:wght@600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app" class="app">
+  <!-- Écran : liste des affaires -->
+  <section id="home" class="home">
+    <header class="masthead">
+      <p class="eyebrow">Dossiers en cours</p>
+      <h1 class="brand">Huis Clos</h1>
+      <p class="tagline">Place les suspects, démasque le coupable.</p>
+    </header>
+    <ol id="case-list" class="case-list"></ol>
+    <details class="rules">
+      <summary>Comment on joue</summary>
+      <ul>
+        <li>Chaque personne occupe une ligne et une colonne différentes.</li>
+        <li>Chaque affaire indique sous le plan quels objets peuvent être occupés. Les cases hachurées ne le peuvent pas.</li>
+        <li>« À côté de » : directement au-dessus, en dessous, à gauche ou à droite, dans la même pièce.</li>
+        <li>« Devant une fenêtre » : sur une case touchée par une fenêtre.</li>
+        <li>Dans certaines grilles, il y a plus de lignes ou de colonnes que de personnes : certaines restent alors vides.</li>
+        <li>La victime était seule avec le meurtrier dans sa pièce.</li>
+      </ul>
+    </details>
+  </section>
+
+  <!-- Écran : une affaire -->
+  <section id="case" class="case" hidden>
+    <header class="case-bar">
+      <button id="back" class="icon-btn" type="button" aria-label="Retour aux affaires">‹ Affaires</button>
+      <div class="case-title">
+        <p id="case-no" class="eyebrow"></p>
+        <h2 id="case-name"></h2>
+      </div>
+    </header>
+
+    <p id="case-intro" class="intro"></p>
+
+    <div class="board-wrap">
+      <div class="board-col">
+        <div id="board" class="board" role="grid" aria-label="Plan de la scène"></div>
+        <div id="obj-legend" class="obj-legend"></div>
+      </div>
+
+      <div class="side-col">
+        <div class="tools" role="toolbar" aria-label="Crayon">
+          <div id="people" class="chips"></div>
+          <div class="chips chips-tools">
+            <button id="tool-x" class="chip tool" type="button" data-tool="x" aria-pressed="false"><span class="x-glyph" aria-hidden="true">✕</span>Barrer</button>
+            <button id="tool-erase" class="chip tool" type="button" data-tool="erase" aria-pressed="false"><span aria-hidden="true">⌫</span>Gomme</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="undo" class="btn" type="button">Annuler</button>
+          <button id="check" class="btn btn-primary" type="button">Vérifier</button>
+          <button id="reset" class="btn btn-ghost" type="button">Recommencer</button>
+        </div>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <section class="clues">
+          <h3>Indices <span class="hint">touche un indice pour le rayer</span></h3>
+          <ol id="clue-list"></ol>
+        </section>
+
+        <label class="option" for="opt-theme">
+          Thème
+          <select id="opt-theme"></select>
+        </label>
+        <label class="option" for="opt-shade">
+          <input id="opt-shade" type="checkbox" checked>
+          Griser les lignes et colonnes déjà occupées
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Verdict -->
+  <div id="verdict" class="verdict" hidden>
+    <div class="verdict-card" role="dialog" aria-modal="true" aria-labelledby="verdict-title">
+      <p class="stamp" aria-hidden="true">Affaire classée</p>
+      <h2 id="verdict-title">Coupable démasqué</h2>
+      <p id="verdict-text"></p>
+      <button id="verdict-close" class="btn btn-primary" type="button">Retour aux affaires</button>
+    </div>
+  </div>
+</main>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
