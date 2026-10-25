@@ -20,9 +20,9 @@ npx serve .        # ou : python3 -m http.server
 Pousser le dossier sur un repo, puis Settings → Pages → « Deploy from a branch » → `main` / racine.
 Le fichier `.nojekyll` évite que GitHub retraite les fichiers.
 
-Après un changement de code (JS/CSS/HTML), incrémenter `VERSION` dans `sw.js`,
-sinon les téléphones qui ont installé l'app gardent l'ancienne version en cache.
-Les grilles (`puzzles/`) sont toujours rechargées depuis le réseau quand c'est possible.
+Pas de numéro de version à gérer : le service worker passe par le réseau d'abord,
+donc un téléphone en ligne charge toujours la dernière version publiée.
+Le cache ne sert qu'hors ligne.
 
 ## Structure
 

@@ -7,7 +7,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 ## Stack
 
 - Site 100 % statique, sans build ni backend. Modules ES natifs. Déploiement sur GitHub Pages (comme le Boggle de Julien).
-- PWA : `manifest.json` + `sw.js`. **Incrémenter `VERSION` dans `sw.js` à chaque changement de JS, CSS ou HTML**, sinon les téléphones gardent l'ancienne version.
+- PWA : `manifest.json` + `sw.js`. Le service worker passe par le réseau d'abord (cache seulement hors ligne) : pas de version à incrémenter, un push sur `main` suffit. Penser à ajouter dans `SHELL` tout nouveau fichier nécessaire hors ligne.
 - En local : `python3 -m http.server` ou `npx serve .`. Ne pas ouvrir `index.html` en `file://`, les `fetch` des grilles échoueraient.
 
 ## Fichiers
