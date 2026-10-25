@@ -76,7 +76,8 @@ function renderHome() {
       <span class="case-meta"><strong></strong><span></span></span>
       <span class="badge ${p}">${label}</span>`;
     btn.querySelector('strong').textContent = puzzle.title;
-    btn.querySelector('.case-meta span').textContent = `${puzzle.difficulty} · ${puzzle.size}×${puzzle.size}`;
+    const cols = Math.max(...puzzle.roomMap.map(row => row.length));
+    btn.querySelector('.case-meta span').textContent = `${puzzle.difficulty} · ${puzzle.roomMap.length}×${cols}`;
     btn.addEventListener('click', () => { location.hash = `c${id}`; });
     li.append(btn);
     return li;
