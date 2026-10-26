@@ -1,5 +1,6 @@
 import { compile, notebook, murderer, cellKey } from './rules.js';
 import { floorFor, objectSvg, SHAPES, THEMES } from './art.js';
+import { deriveKey, exportKey, importKey, open, fromB64 } from './vault.js';
 
 const $ = sel => document.querySelector(sel);
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -43,16 +44,78 @@ const themeOf = puzzle => (options.theme !== 'auto' && THEMES[options.theme]) ? 
 // ---------- Chargement ----------
 async function loadCatalog() {
   const index = await (await fetch('puzzles/index.json')).json();
-  // Grilles privées (recopiées du livre), présentes seulement en local / sur un déploiement privé.
-  try {
-    const res = await fetch('puzzles/livre/index.json');
-    if (res.ok) index.push(...await res.json());
-  } catch { /* pas de grilles privées */ }
   catalog = await Promise.all(index.map(async entry => ({
     ...entry,
     puzzle: await (await fetch(`puzzles/${entry.file}`)).json(),
   })));
+  catalog.push(...await privateCases());
 }
+
+// ---------- Affaires privées (grilles du livre) ----------
+// En local, les fichiers en clair de puzzles/livre/. En ligne, seulement leur version chiffrée,
+// ouverte par mot de passe (lien « ?livre ») ; le téléphone garde ensuite la clé.
+let vault = null;          // contenu de puzzles/livre.enc.json
+let vaultOpen = false;
+const WANT_VAULT = new URLSearchParams(location.search).has('livre');
+
+async function privateCases() {
+  try {
+    const res = await fetch('puzzles/livre/index.json');
+    if (res.ok) {
+      vaultOpen = true;
+      return Promise.all((await res.json()).map(async entry => ({
+        ...entry,
+        puzzle: await (await fetch(`puzzles/${entry.file}`)).json(),
+      })));
+    }
+  } catch { /* pas de fichiers en clair */ }
+  try {
+    const res = await fetch('puzzles/livre.enc.json');
+    if (!res.ok) return [];
+    vault = await res.json();
+  } catch { return []; }
+  const saved = store.get('hc:livre', null);
+  if (!saved || saved.salt !== vault.salt) return [];
+  try {
+    const cases = await open(vault, await importKey(saved.key));
+    vaultOpen = true;
+    return cases;
+  } catch {
+    localStorage.removeItem('hc:livre'); // mot de passe changé depuis
+    return [];
+  }
+}
+
+function renderVault() {
+  const form = $('#vault');
+  form.hidden = !(WANT_VAULT && vault);
+  $('#vault-ask').hidden = vaultOpen;
+  $('#vault-done').hidden = !vaultOpen;
+}
+
+$('#vault').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = $('#vault-msg');
+  const input = $('#vault-pass');
+  msg.textContent = 'Vérification…';
+  try {
+    const key = await deriveKey(input.value, fromB64(vault.salt), vault.iterations);
+    const cases = await open(vault, key);
+    store.set('hc:livre', { salt: vault.salt, key: await exportKey(key) });
+    catalog = catalog.filter(c => !cases.some(x => x.id === c.id)).concat(cases);
+    vaultOpen = true;
+    input.value = '';
+    msg.textContent = '';
+    renderHome();
+  } catch {
+    msg.textContent = 'Mot de passe incorrect.';
+  }
+});
+
+$('#vault-lock').addEventListener('click', () => {
+  localStorage.removeItem('hc:livre');
+  location.reload();
+});
 
 function progressOf(id) {
   const s = store.get(`hc:case:${id}`, null);
@@ -63,6 +126,7 @@ function progressOf(id) {
 
 // ---------- Accueil ----------
 function renderHome() {
+  renderVault();
   const list = $('#case-list');
   list.replaceChildren(...catalog.map(({ id, puzzle }) => {
     const li = document.createElement('li');

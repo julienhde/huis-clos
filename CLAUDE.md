@@ -16,8 +16,10 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 - `js/art.js` : rendu visuel. Sols par type de pièce, dessins SVG des objets par thème (`THEMES`).
 - `js/app.js` : interface (crayon, barrer, gomme, annuler, vérifier, sauvegarde localStorage, choix du thème, légende).
 - `style.css` : thème de l'interface, plan, puis section « Thèmes visuels » scopée par `.t-<thème>`.
+- `js/vault.js` : chiffrement des affaires privées (AES-GCM, clé PBKDF2), partagé navigateur et node.
 - `tools/check.mjs` : `node tools/check.mjs puzzles/X.json` vérifie que la solution est unique. `--suggest [--seed=N]` propose un jeu d'indices minimal.
-- `puzzles/` : grilles originales. `puzzles/livre/` : grilles recopiées du livre, **usage privé, ignorées par git, ne jamais les publier**.
+- `puzzles/` : grilles originales. `puzzles/livre/` : grilles recopiées du livre, **usage privé, ignorées par git, ne jamais les publier en clair**.
+- `puzzles/livre.enc.json` : ces mêmes grilles chiffrées (décision de Julien, pour un usage familial). Seul ce fichier est publié. Régénérer avec `HC_PASSWORD='…' node tools/encrypt.mjs` après tout ajout dans `puzzles/livre/`. **Le mot de passe n'est jamais écrit dans le dépôt** (ni code, ni commit, ni doc) ; Julien le garde. Dans l'app : lien `?livre`, le téléphone garde ensuite la clé.
 - `README.md` : format JSON complet des grilles et liste des types d'indices.
 
 ## Règles du jeu (validées contre les grilles du livre)

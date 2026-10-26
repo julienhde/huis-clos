@@ -2,7 +2,7 @@
 // Réseau d'abord pour tout : en ligne, on a toujours la dernière version publiée,
 // sans numéro de version à gérer. Le cache ne sert qu'hors ligne.
 const CACHE = 'hc';
-const SHELL = ['./', 'index.html', 'style.css', 'js/app.js', 'js/rules.js', 'js/art.js', 'manifest.json', 'icon.svg', 'puzzles/index.json'];
+const SHELL = ['./', 'index.html', 'style.css', 'js/app.js', 'js/rules.js', 'js/art.js', 'js/vault.js', 'manifest.json', 'icon.svg', 'puzzles/index.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

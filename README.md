@@ -24,6 +24,21 @@ Pas de numéro de version à gérer : le service worker passe par le réseau d'a
 donc un téléphone en ligne charge toujours la dernière version publiée.
 Le cache ne sert qu'hors ligne.
 
+## Affaires privées (chiffrées)
+
+Les grilles de `puzzles/livre/` ne sont jamais publiées en clair (dossier ignoré par git).
+Seule leur version chiffrée, `puzzles/livre.enc.json`, est dans le dépôt :
+
+```sh
+HC_PASSWORD='le mot de passe' node tools/encrypt.mjs
+```
+
+Le mot de passe ne s'écrit nulle part dans le dépôt. Pour ouvrir les affaires sur un téléphone :
+ouvrir le site avec `?livre` à la fin de l'adresse, saisir le mot de passe une fois.
+L'appareil garde la clé ; « Refermer » (même lien) l'oublie.
+Réchiffrer avec le même mot de passe garde les téléphones déjà ouverts ; pour changer de mot de passe,
+supprimer d'abord `puzzles/livre.enc.json`.
+
 ## Structure
 
 ```
@@ -33,6 +48,8 @@ js/app.js                 interface : crayon, annuler, vérifier, sauvegarde loc
 puzzles/index.json        liste des affaires
 puzzles/NNN.json          une affaire
 tools/check.mjs           vérifie qu'une grille a une solution unique
+tools/encrypt.mjs         chiffre les affaires privées
+js/vault.js               chiffrement (navigateur + node)
 sw.js, manifest.json      PWA
 ```
 

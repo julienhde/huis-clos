@@ -35,6 +35,17 @@
       </ul>
     </details>
     <ol id="case-list" class="case-list"></ol>
+    <form id="vault" class="vault" hidden>
+      <div id="vault-ask">
+        <label for="vault-pass">Affaires privées</label>
+        <div class="vault-row">
+          <input id="vault-pass" type="password" autocomplete="current-password" required>
+          <button class="btn btn-primary" type="submit">Ouvrir</button>
+        </div>
+        <p id="vault-msg" class="vault-msg" role="status" aria-live="polite"></p>
+      </div>
+      <p id="vault-done" class="vault-msg">Affaires privées ouvertes sur cet appareil. <button id="vault-lock" class="link-btn" type="button">Refermer</button></p>
+    </form>
   </section>
 
   <!-- Écran : une affaire -->
