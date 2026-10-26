@@ -36,6 +36,12 @@ HC_PASSWORD='le mot de passe' node tools/encrypt.mjs
 Le mot de passe ne s'écrit nulle part dans le dépôt. Pour ouvrir les affaires sur un téléphone :
 petit lien « Affaires privées » tout en bas de l'accueil (ou `?livre` à la fin de l'adresse),
 saisir le mot de passe une fois. L'appareil garde la clé ; « Refermer » l'oublie.
+Pour retrouver les grilles en clair (par exemple dans un clone neuf, où `puzzles/livre/` n'existe pas) :
+
+```sh
+HC_PASSWORD='le mot de passe' node tools/decrypt.mjs
+```
+
 Les majuscules et les espaces autour du mot de passe sont ignorés.
 Réchiffrer avec le même mot de passe garde les téléphones déjà ouverts ; pour changer de mot de passe,
 supprimer d'abord `puzzles/livre.enc.json`.
@@ -50,6 +56,7 @@ puzzles/index.json        liste des affaires
 puzzles/NNN.json          une affaire
 tools/check.mjs           vérifie qu'une grille a une solution unique
 tools/encrypt.mjs         chiffre les affaires privées
+tools/decrypt.mjs         les remet en clair dans puzzles/livre/
 js/vault.js               chiffrement (navigateur + node)
 sw.js, manifest.json      PWA
 ```

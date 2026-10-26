@@ -19,7 +19,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 - `js/vault.js` : chiffrement des affaires privées (AES-GCM, clé PBKDF2), partagé navigateur et node.
 - `tools/check.mjs` : `node tools/check.mjs puzzles/X.json` vérifie que la solution est unique. `--suggest [--seed=N]` propose un jeu d'indices minimal.
 - `puzzles/` : grilles originales. `puzzles/livre/` : grilles recopiées du livre, **usage privé, ignorées par git, ne jamais les publier en clair**.
-- `puzzles/livre.enc.json` : ces mêmes grilles chiffrées (décision de Julien, pour un usage familial). Seul ce fichier est publié. Régénérer avec `HC_PASSWORD='…' node tools/encrypt.mjs` après tout ajout dans `puzzles/livre/`. **Le mot de passe n'est jamais écrit dans le dépôt** (ni code, ni commit, ni doc) ; Julien le garde. Dans l'app : petit lien « Affaires privées » en bas de l'accueil (ou `?livre`), l'appareil garde ensuite la clé. Sœurs : app installée sur l'écran d'accueil, donc pas de lien à taper.
+- `puzzles/livre.enc.json` : ces mêmes grilles chiffrées (décision de Julien, pour un usage familial). Seul ce fichier est publié. **Début de session : `puzzles/livre/` n'existe pas dans un clone neuf** ; le recréer avec `HC_PASSWORD='…' node tools/decrypt.mjs` (demander le mot de passe à Julien). Après tout ajout ou correction dans `puzzles/livre/`, rechiffrer avec `HC_PASSWORD='…' node tools/encrypt.mjs`. Le fichier chiffré est la seule sauvegarde des grilles transcrites : ne jamais le supprimer sans avoir les grilles en clair. **Le mot de passe n'est jamais écrit dans le dépôt** (ni code, ni commit, ni doc) ; Julien le garde. Dans l'app : petit lien « Affaires privées » en bas de l'accueil (ou `?livre`), l'appareil garde ensuite la clé. Sœurs : app installée sur l'écran d'accueil, donc pas de lien à taper.
 - `README.md` : format JSON complet des grilles et liste des types d'indices.
 
 ## Règles du jeu (validées contre les grilles du livre)
@@ -46,6 +46,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 
 ## À faire / ouvert
 
+- Transcrire le reste du livre (Julien envoie les photos des pages, les solutions au crayon de sa sœur servent de contrôle). Ses deux sœurs ont le livre.
 - Faire vérifier par la sœur les coupables trouvés par le solveur dans les solutions du livre : affaire 30 = Albert, 31 = Bella, 75 = Arnold (rôles : Brenda acrobate, Daniel lanceur, Cecily dompteuse). Les affaires 1 à 11 sont confirmées (2 à 10 recopiées depuis ses photos : le solveur retrouve ses placements au crayon).
 - Une étiquette de pièce chevauche parfois un objet de la pièce du dessous (affaire 8 : « Terrasse » sur la TV).
 - Lion et cheval sont encore en emoji : à dessiner.
