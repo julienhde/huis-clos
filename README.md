@@ -79,7 +79,7 @@ sw.js, manifest.json      PWA
 - `people` : `g` (`f`/`m`) accorde les phrases, `hue` colore le jeton. `victim` : id de la victime.
 - `theme` (facultatif) : thème visuel par défaut de l'affaire (`manoir`, `chateau`, `cyberpunk`). Le joueur peut l'imposer partout via le réglage « Thème » ; sur « Auto », c'est celui de l'affaire qui s'applique.
 - Pièces : `floor` (facultatif) force le type de sol (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
-- `rules` : règles globales, ex. `["no_empty_room"]`.
+- `rules` : règles globales, ex. `["no_empty_room"]`, ou `{ "type": "only_one_on", "object": "lit" }` (« Une seule personne était sur un lit. »).
 - `roles` (rôles inconnus) : `{ "candidates": ["B","C","D"], "list": { "acrobate": { "label": "l'acrobate", "g": "f" }, … } }`.
   Dans les indices, `"who": "role:acrobate"` ou `"other": "role:acrobate"`.
 
@@ -91,6 +91,8 @@ sw.js, manifest.json      PWA
 | `only_on`            | `object`                                 | Donna était la seule personne dans un fauteuil. |
 | `next_to` / `not_next_to` | `object`                            | Ella était à côté d'une plante. |
 | `window`             | —                                        | Axel était devant une fenêtre. |
+| `only_window`        | —                                        | Clara était la seule personne devant une fenêtre. |
+| `next_to_wall` / `not_next_to_wall` | —                         | Dahlia n'était pas à côté d'un mur (aucun côté de sa case ne touche un mur). |
 | `in_room` / `not_in_room` | `room`                              | Bella était dans l'entrée. |
 | `room_has`           | `object`                                 | Il y avait une TV dans la pièce d'Andy. |
 | `same_room` / `not_same_room` | `other`                         | … |

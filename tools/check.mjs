@@ -26,7 +26,7 @@ for (const [id, [r, c]] of Object.entries(sol)) {
   rows.add(r); cols.add(c);
 }
 if (rows.size !== g.people.length || cols.size !== g.people.length) throw new Error('Une ligne ou une colonne a plusieurs personnes');
-for (const rule of g.rules) if (!checkGlobal(g, rule, sol)) throw new Error(`Règle non respectée : ${rule}`);
+for (const rule of g.rules) if (!checkGlobal(g, rule, sol)) throw new Error(`Règle non respectée : ${JSON.stringify(rule)}`);
 const killer = murderer(g, sol);
 if (!killer) throw new Error('La victime doit partager sa pièce avec exactement un suspect');
 console.log(`Coupable : ${g.byId[killer].name}`);

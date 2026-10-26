@@ -46,7 +46,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 
 ## À faire / ouvert
 
-- Faire vérifier par la sœur les coupables trouvés par le solveur dans les solutions du livre : affaire 30 = Albert, 31 = Bella, 75 = Arnold (rôles : Brenda acrobate, Daniel lanceur, Cecily dompteuse). Les affaires 1, 8 et 11 sont confirmées.
+- Faire vérifier par la sœur les coupables trouvés par le solveur dans les solutions du livre : affaire 30 = Albert, 31 = Bella, 75 = Arnold (rôles : Brenda acrobate, Daniel lanceur, Cecily dompteuse). Les affaires 1 à 11 sont confirmées (2 à 10 recopiées depuis ses photos : le solveur retrouve ses placements au crayon).
 - Une étiquette de pièce chevauche parfois un objet de la pièce du dessous (affaire 8 : « Terrasse » sur la TV).
 - Lion et cheval sont encore en emoji : à dessiner.
 - Pas encore de générateur de grilles (seulement `--suggest` pour les indices).

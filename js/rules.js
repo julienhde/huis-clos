@@ -22,11 +22,19 @@ export const OBJECTS = {
   tonneau:  { label: 'Tonneau',  icon: '🛢️', occupiable: false, single: true, un: 'un tonneau',  de: "d'un tonneau" },
   lion:     { label: 'Lion',     icon: '🦁', occupiable: false, single: true, un: 'un lion',     de: "d'un lion" },
   ratelier: { label: "Râtelier d'armes", icon: '⚔️', occupiable: false, single: true, un: "un râtelier d'armes", de: "d'un râtelier d'armes" },
+  caisse:   { label: 'Caisse enregistreuse', icon: '🧾', occupiable: false, single: true, un: 'une caisse enregistreuse', de: "d'une caisse enregistreuse" },
 };
 
 export const GLOBAL_RULES = {
   no_empty_room: "Il n'y avait pas de pièce vide.",
 };
+
+/** Texte d'une règle globale : un nom (`no_empty_room`) ou un objet (`{ type: 'only_one_on', object: 'lit' }`). */
+export function ruleText(g, rule) {
+  if (typeof rule === 'string') return GLOBAL_RULES[rule];
+  if (rule.type === 'only_one_on') return `Une seule personne était ${g.types[rule.object].sur}.`;
+  throw new Error(`Règle inconnue : ${JSON.stringify(rule)}`);
+}
 
 const key = (r, c) => `${r},${c}`;
 const SIDES = { n: [-1, 0], s: [1, 0], w: [0, -1], e: [0, 1] };
@@ -121,6 +129,9 @@ function neighbors(g, r, c) {
   return out;
 }
 
+/** Contre un mur : une case voisine d'une autre pièce, hors plan ou au bord. */
+const touchesWall = (g, r, c) => Object.values(SIDES).some(([dr, dc]) => g.roomAt(r + dr, c + dc) !== g.roomAt(r, c));
+
 /** Coin de pièce : un mur (autre pièce, hors plan ou bord) en haut ou en bas, ET à gauche ou à droite. */
 function isRoomCorner(g, r, c) {
   const wall = (dr, dc) => g.roomAt(r + dr, c + dc) !== g.roomAt(r, c);
@@ -150,7 +161,7 @@ const colEmpty = (pos, col, except) => Object.entries(pos).every(([id, [, c]]) =
 
 /** Indices qui ne dépendent que de la position de la personne (servent à élaguer). */
 const UNARY = new Set(['on', 'not_on', 'next_to', 'not_next_to', 'window', 'in_room', 'not_in_room', 'room_has',
-  'row', 'col', 'corner', 'dir_object', 'col_has']);
+  'row', 'col', 'corner', 'dir_object', 'col_has', 'next_to_wall', 'not_next_to_wall']);
 
 /**
  * Évalue un indice. Avec `partial`, `pos` peut être incomplet : on ne renvoie faux
@@ -169,6 +180,9 @@ export function checkClue(g, clue, pos, partial = false) {
     case 'next_to':     return neighbors(g, r, c).some(([rr, cc]) => g.has(rr, cc, clue.object));
     case 'not_next_to': return !neighbors(g, r, c).some(([rr, cc]) => g.has(rr, cc, clue.object));
     case 'window':      return g.windowCells.has(key(r, c));
+    case 'only_window': return g.windowCells.has(key(r, c)) && others(pos, clue.who).every(o => !g.windowCells.has(key(...pos[o])));
+    case 'next_to_wall':     return touchesWall(g, r, c);
+    case 'not_next_to_wall': return !touchesWall(g, r, c);
     case 'in_room':     return g.roomAt(r, c) === clue.room;
     case 'not_in_room': return g.roomAt(r, c) !== clue.room;
     case 'room_has':    return g.roomObjects[g.roomAt(r, c)].has(clue.object);
@@ -205,6 +219,9 @@ export function checkClue(g, clue, pos, partial = false) {
 }
 
 export function checkGlobal(g, rule, pos) {
+  if (rule.type === 'only_one_on') {
+    return Object.values(pos).filter(([r, c]) => g.has(r, c, rule.object)).length === 1;
+  }
   if (rule === 'no_empty_room') {
     const used = new Set(Object.values(pos).map(([r, c]) => g.roomAt(r, c)));
     return used.size === g.rooms.length;
@@ -250,6 +267,7 @@ function solveFixed(g, clues, limit, out) {
   for (const id of ids) {
     const unary = clues.filter(cl => cl.who === id && UNARY.has(cl.type))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'only_on').map(cl => ({ ...cl, type: 'on' })))
+      .concat(clues.filter(cl => cl.who === id && cl.type === 'only_window').map(cl => ({ ...cl, type: 'window' })))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'col_has_exclusive').map(cl => ({ ...cl, type: 'col_has' })))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'alone' && cl.room !== undefined).map(cl => ({ who: id, type: 'in_room', room: cl.room })));
     cand[id] = [];
@@ -325,6 +343,8 @@ const de = name => /^le /i.test(name) ? name.replace(/^le /i, 'du ')
   : /^les /i.test(name) ? name.replace(/^les /i, 'des ')
   : /^[aeiouyéèêàâîïôûh]/i.test(name) && !/^l'/i.test(name) ? `d'${name}` : `de ${name}`;
 
+const que = name => /^[aeiouyéèêàâîïôûh]/i.test(name) ? `qu'${name}` : `que ${name}`;
+
 /** Phrase française d'un indice, à l'imparfait comme dans un rapport d'enquête. */
 export function clueText(g, clue) {
   if (clue.text) return clue.text;
@@ -346,11 +366,14 @@ export function clueText(g, clue) {
       case 'next_to':     return `${n} était à côté ${O.de}.`;
       case 'not_next_to': return `${n} n'était pas à côté ${O.de}.`;
       case 'window':      return `${n} était devant une fenêtre.`;
+      case 'only_window': return `${n} était la seule personne devant une fenêtre.`;
+      case 'next_to_wall':     return `${n} était à côté d'un mur.`;
+      case 'not_next_to_wall': return `${n} n'était pas à côté d'un mur.`;
       case 'in_room':     return `${n} était ${room(clue.room).dans}.`;
       case 'not_in_room': return `${n} n'était pas ${room(clue.room).dans}.`;
       case 'room_has':    return `Il y avait ${O.un} dans la pièce ${de(n)}.`;
-      case 'same_room':   return `${n} était dans la même pièce que ${other}.`;
-      case 'not_same_room': return `${n} n'était pas dans la même pièce que ${other}.`;
+      case 'same_room':   return `${n} était dans la même pièce ${que(other)}.`;
+      case 'not_same_room': return `${n} n'était pas dans la même pièce ${que(other)}.`;
       case 'alone':       return clue.room === undefined ? `${n} était ${seul}.` : `${n} était ${seul} ${room(clue.room).dans}.`;
       case 'alone_with':  return `${n} était ${seul} avec ${other}.`;
       case 'no_gender_in_room': return `Il n'y avait pas ${clue.gender === 'f' ? 'de femme' : "d'homme"} dans la pièce ${de(n)}.`;
@@ -380,7 +403,7 @@ export function notebook(g) {
     lines.push(`${names.slice(0, -1).join(', ')} et ${names.at(-1)} étaient ${roles.slice(0, -1).join(', ')} et ${roles.at(-1)}, dans un ordre inconnu.`);
   }
   lines.push(...g.clues.map(cl => clueText(g, cl)));
-  lines.push(...g.rules.map(r => GLOBAL_RULES[r]));
+  lines.push(...g.rules.map(r => ruleText(g, r)));
   lines.push(`${v.name} est la victime : ${v.g === 'f' ? 'elle' : 'il'} était ${v.g === 'f' ? 'seule' : 'seul'} avec le meurtrier.`);
   return lines;
 }
