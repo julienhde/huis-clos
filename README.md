@@ -36,6 +36,7 @@ HC_PASSWORD='le mot de passe' node tools/encrypt.mjs
 Le mot de passe ne s'écrit nulle part dans le dépôt. Pour ouvrir les affaires sur un téléphone :
 petit lien « Affaires privées » tout en bas de l'accueil (ou `?livre` à la fin de l'adresse),
 saisir le mot de passe une fois. L'appareil garde la clé ; « Refermer » l'oublie.
+Les majuscules et les espaces autour du mot de passe sont ignorés.
 Réchiffrer avec le même mot de passe garde les téléphones déjà ouverts ; pour changer de mot de passe,
 supprimer d'abord `puzzles/livre.enc.json`.
 

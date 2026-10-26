@@ -14,9 +14,12 @@ export function toB64(bytes) {
 
 export const fromB64 = b64 => Uint8Array.from(atob(b64), ch => ch.charCodeAt(0));
 
+/** Majuscules et espaces autour ignorés : le clavier du téléphone met souvent une majuscule. */
+export const normalize = password => password.trim().toLowerCase();
+
 /** Clé AES tirée du mot de passe (lent exprès : environ une seconde sur téléphone). */
 export async function deriveKey(password, salt, iterations = ITERATIONS) {
-  const base = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  const base = await crypto.subtle.importKey('raw', enc.encode(normalize(password)), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
     { name: 'PBKDF2', hash: 'SHA-256', salt, iterations },
     base, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt'],
