@@ -1,5 +1,5 @@
 import { compile, notebook, murderer, cellKey } from './rules.js';
-import { floorFor, objectSvg, SHAPES, THEMES } from './art.js';
+import { floorFor, hueFor, objectSvg, SHAPES, THEMES } from './art.js';
 import { deriveKey, exportKey, importKey, open, fromB64 } from './vault.js';
 
 const $ = sel => document.querySelector(sel);
@@ -308,6 +308,7 @@ function renderBoard(popKey = null, nopeKey = null) {
   const side = Math.ceil(Math.sqrt(g.people.length));
   board.style.setProperty('--nside', side);
   const floors = g.rooms.map(floorFor);
+  const hues = g.rooms.map(hueFor);
 
   // Axes.
   for (let c = 0; c < g.cols; c++) {
@@ -360,7 +361,7 @@ function renderBoard(popKey = null, nopeKey = null) {
       const btn = place(document.createElement('button'), r, c);
       btn.type = 'button';
       btn.className = `cell f-${floors[room]}`;
-      btn.style.setProperty('--h', g.rooms[room].hue);
+      btn.style.setProperty('--h', hues[room]);
       // Murs : en haut/à gauche dès que la pièce change ; à droite/en bas seulement au bord du plan.
       if (g.roomAt(r - 1, c) !== room) btn.classList.add('wt');
       if (g.roomAt(r, c - 1) !== room) btn.classList.add('wl');
@@ -427,7 +428,7 @@ function renderBoard(popKey = null, nopeKey = null) {
       if (!b.rect) continue; // déjà dessiné en morceaux
       el.className = `ob ob-${shape} ${b.h > b.w ? 'vert' : 'horiz'}`;
       el.style.setProperty('--len', Math.max(b.h, b.w));
-      el.style.setProperty('--h', g.rooms[g.roomAt(...inst.cells[0])].hue);
+      el.style.setProperty('--h', hues[g.roomAt(...inst.cells[0])]);
       if (shape === 'bed') el.innerHTML = '<i class="pillow"></i>';
     } else {
       const svg = objectSvg(inst.type, theme);

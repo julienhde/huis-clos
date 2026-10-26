@@ -85,7 +85,7 @@ sw.js, manifest.json      PWA
 - `windows` : `{ cell: [l, c], side: "n" | "s" | "e" | "w" }`.
 - `people` : `g` (`f`/`m`) accorde les phrases, `hue` colore le jeton. `victim` : id de la victime.
 - `theme` (facultatif) : thème visuel par défaut de l'affaire (`manoir`, `chateau`, `cyberpunk`). Le joueur peut l'imposer partout via le réglage « Thème » ; sur « Auto », c'est celui de l'affaire qui s'applique.
-- Pièces : `floor` (facultatif) force le type de sol (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
+- Pièces : le sol et parfois la teinte se déduisent du nom (`FLOOR_RULES` dans `js/art.js` : la mer est de l'eau bleue, les douches un carrelage bleu clair…). `floor` (facultatif) force le type de sol et garde alors la teinte `hue` de la grille (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
 - `alone` accepte `rooms` (seule dans l'une de ces pièces) ; `not_next_to` accepte `objects` (aucun de ces objets).
 - Un indice avec `"text": ""` n'est pas affiché : sa condition est déjà dite par la phrase de l'indice précédent.
 - `rules` : règles globales, ex. `["no_empty_room"]`, `{ "type": "only_one_on", "object": "lit" }` (« Une seule personne était sur un lit. ») ou

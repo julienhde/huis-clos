@@ -1,21 +1,37 @@
 // Habillage du plan : sols par type de pièce et dessins d'objets vus de dessus.
 // Tout est en SVG/CSS inline (aucune image externe), coloré par les variables du thème.
 
-/** Sol d'une pièce : `room.floor` s'il est donné, sinon déduit du nom. */
+/**
+ * Sol d'une pièce selon son nom : [motif, teinte imposée ou null].
+ * La première règle qui correspond gagne : les plus précises d'abord.
+ * Sans teinte imposée, la pièce garde la teinte de sa grille.
+ */
 const FLOOR_RULES = [
-  [/jacuzzi|piscine|bassin|fontaine|étang/i, 'water'],
-  [/jardin|parc|pelouse|potager/i, 'grass'],
-  [/terrasse|écurie|grange|ponton|véranda/i, 'deck'],
-  [/salle à manger|réfectoire/i, 'diamond'],
-  [/couloir|activités|hall|gym/i, 'checker'],
-  [/cuisine|bains|toilettes|entrée|accueil|ascenseur|buanderie/i, 'tiles'],
-  [/gradins|loge|cinéma|théâtre/i, 'carpet'],
-  [/démolition|chantier|garage|cave|entrepôt/i, 'concrete'],
-  [/piste|scène/i, 'stage'],
+  [/mer\b|océan|lac\b|rivière|piscine|bassin|fontaine|étang|jacuzzi/i, 'water', 200],
+  [/jardin|parc|pelouse|potager|prairie/i, 'grass', 110],
+  [/douche|décontamination|laboratoire|expérimentation/i, 'tiles', 190],
+  [/chambre froide|surgelés|congélateur|frigo/i, 'tiles', 205],
+  [/terrasse|écurie|grange|ponton|véranda|pont\b/i, 'deck', null],
+  [/salle à manger|réfectoire|restaurant/i, 'diamond', null],
+  [/couloir|activités|hall|gym|entraînement|magasin|caisses|comptoir|rayon|goûters|boissons|viande|boulangerie|fruits|ordinateurs|loisirs/i, 'checker', null],
+  [/cuisine|bains|toilettes|entrée|accueil|ascenseur|buanderie|cellier|salle de pause|vestiaire/i, 'tiles', null],
+  [/gradins|loge|cinéma|théâtre|classe|cockpit|vip|cabine|salle d'attente|salle commune|bar\b|galerie|bureau|interrogatoire/i, 'carpet', null],
+  [/démolition|chantier|garage|cave|entrepôt|sous-sol|débarras|réserve|cellule|pièces à conviction|réparations/i, 'concrete', null],
+  [/piste|scène|ring/i, 'stage', null],
 ];
+
+const ruleFor = room => FLOOR_RULES.find(([re]) => re.test(room.name));
+
+/** Sol d'une pièce : `room.floor` s'il est donné, sinon déduit du nom (parquet par défaut). */
 export function floorFor(room) {
   if (room.floor) return room.floor;
-  return FLOOR_RULES.find(([re]) => re.test(room.name))?.[1] ?? 'wood';
+  return ruleFor(room)?.[1] ?? 'wood';
+}
+
+/** Teinte d'une pièce : imposée par son nom pour la mer, le jardin, les douches… sinon celle de la grille. */
+export function hueFor(room) {
+  if (room.floor) return room.hue;
+  return ruleFor(room)?.[2] ?? room.hue;
 }
 
 /** Objets qui s'étendent sur plusieurs cases et se dessinent en CSS. */
