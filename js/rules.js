@@ -22,6 +22,8 @@ export const OBJECTS = {
   tonneau:  { label: 'Tonneau',  icon: '🛢️', occupiable: false, single: true, un: 'un tonneau',  de: "d'un tonneau" },
   lion:     { label: 'Lion',     icon: '🦁', occupiable: false, single: true, un: 'un lion',     de: "d'un lion" },
   ratelier: { label: "Râtelier d'armes", icon: '⚔️', occupiable: false, single: true, un: "un râtelier d'armes", de: "d'un râtelier d'armes" },
+  cadeau:   { label: 'Cadeau',   icon: '🎁', occupiable: false, single: true, un: 'un cadeau',   de: "d'un cadeau" },
+  statue:   { label: 'Statue',   icon: '🗿', occupiable: false, single: true, un: 'une statue',  de: "d'une statue" },
   caisse:   { label: 'Caisse enregistreuse', icon: '🧾', occupiable: false, single: true, un: 'une caisse enregistreuse', de: "d'une caisse enregistreuse" },
 };
 
@@ -191,8 +193,9 @@ export function checkClue(g, clue, pos, partial = false) {
     case 'corner':      return isRoomCorner(g, r, c);
     case 'dir_object':  return (g.cellsOf[clue.object] ?? []).some(o =>
                           inDirection([r, c], o, clue.dir, clue.exact) && (!clue.sameRoom || g.roomAt(...o) === g.roomAt(r, c)));
-    case 'col_has':     return (g.cellsOf[clue.object] ?? []).some(([rr, cc]) =>
-                          cc === c && (!clue.otherRoom || g.roomAt(rr, cc) !== g.roomAt(r, c)));
+    case 'col_has':     return (g.cellsOf[clue.object] ?? []).some(([rr, cc]) => cc === c
+                          && (!clue.otherRoom || g.roomAt(rr, cc) !== g.roomAt(r, c))
+                          && (!clue.sameRoom || g.roomAt(rr, cc) === g.roomAt(r, c)));
     case 'col_has_exclusive': {
       const cols = new Set((g.cellsOf[clue.object] ?? []).map(([, cc]) => cc));
       return cols.has(c) && [...cols].every(cc => cc === c || colEmpty(pos, cc, clue.who));
@@ -210,6 +213,11 @@ export function checkClue(g, clue, pos, partial = false) {
       const o = othersInRoom(g, pos, clue.who);
       if (partial) return o.every(x => x === clue.other);
       return o.length === 1 && o[0] === clue.other;
+    }
+    case 'alone_with_gender': {
+      const o = othersInRoom(g, pos, clue.who);
+      if (partial) return o.length <= 1 && o.every(x => g.byId[x].g === clue.gender);
+      return o.length === 1 && g.byId[o[0]].g === clue.gender;
     }
     case 'no_gender_in_room':
       return othersInRoom(g, pos, clue.who).every(o => g.byId[o].g !== clue.gender);
@@ -384,7 +392,8 @@ export function clueText(g, clue) {
       case 'col':         return `${n} était dans la ${ORDINALS[clue.col]} colonne.`;
       case 'dir_object':  return `${n} était ${dirText(clue.dir, clue.exact, unit(clue.dir))} ${O.de}${clue.sameRoom ? ', dans la même pièce' : ''}.`;
       case 'dir_person':  return `${n} était ${dirText(clue.dir, clue.exact, unit(clue.dir))} ${de(other)}.`;
-      case 'col_has':     return `Il y avait ${O.un} dans la colonne ${de(n)}${clue.otherRoom ? ', dans une autre pièce' : ''}.`;
+      case 'col_has':     return `Il y avait ${O.un} dans la colonne ${de(n)}${clue.otherRoom ? ', dans une autre pièce' : clue.sameRoom ? ', dans la même pièce' : ''}.`;
+      case 'alone_with_gender': return `${n} était ${seul} avec ${clue.gender === 'f' ? 'une femme' : 'un homme'}.`;
       case 'col_has_exclusive': return `Il y avait ${O.un} dans la colonne ${de(n)}. Toutes les autres colonnes avec ${O.un} étaient vides.`;
       case 'adjacent_col_empty': return `La colonne directement ${clue.dir === 'e' ? "à l'est" : "à l'ouest"} ${de(n)} était vide.`;
       default:            return '?';

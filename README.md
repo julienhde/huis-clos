@@ -110,7 +110,8 @@ sw.js, manifest.json      PWA
 | `row` / `col`        | `row` / `col` (index 0)                  | Bennett était dans la cinquième colonne. |
 | `dir_person`         | `other`, `dir` (n,s,e,w,ne…), `exact`    | Cecily était exactement quatre lignes au sud d'Eddie. |
 | `dir_object`         | `object`, `dir`, `exact`, `sameRoom`     | Clarence était au sud-ouest d'une TV, dans la même pièce. |
-| `col_has`            | `object`, `otherRoom`                    | Il y avait une TV dans la colonne de Benjamin, dans une autre pièce. |
+| `col_has`            | `object`, `otherRoom` ou `sameRoom`      | Il y avait une TV dans la colonne de Benjamin, dans une autre pièce. |
+| `alone_with_gender`  | `gender`                                 | Gavin était seul avec une femme (une seule autre personne dans sa pièce). |
 | `col_has_exclusive`  | `object`                                 | Il y avait un tonneau dans la colonne d'Eddie. Toutes les autres colonnes avec un tonneau étaient vides. |
 | `adjacent_col_empty` | `dir` (e/w)                              | La colonne directement à l'est de Brenda était vide. |
 
