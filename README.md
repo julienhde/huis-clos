@@ -86,7 +86,10 @@ sw.js, manifest.json      PWA
 - `people` : `g` (`f`/`m`) accorde les phrases, `hue` colore le jeton. `victim` : id de la victime.
 - `theme` (facultatif) : thème visuel par défaut de l'affaire (`manoir`, `chateau`, `cyberpunk`). Le joueur peut l'imposer partout via le réglage « Thème » ; sur « Auto », c'est celui de l'affaire qui s'applique.
 - Pièces : `floor` (facultatif) force le type de sol (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
-- `rules` : règles globales, ex. `["no_empty_room"]`, ou `{ "type": "only_one_on", "object": "lit" }` (« Une seule personne était sur un lit. »).
+- `alone` accepte `rooms` (seule dans l'une de ces pièces) ; `not_next_to` accepte `objects` (aucun de ces objets).
+- Un indice avec `"text": ""` n'est pas affiché : sa condition est déjà dite par la phrase de l'indice précédent.
+- `rules` : règles globales, ex. `["no_empty_room"]`, `{ "type": "only_one_on", "object": "lit" }` (« Une seule personne était sur un lit. ») ou
+  `{ "type": "empty_rooms", "rooms": [0, 1, 2], "count": 2 }` (exactement deux de ces pièces vides). `text` facultatif.
 - `roles` (rôles inconnus) : `{ "candidates": ["B","C","D"], "list": { "acrobate": { "label": "l'acrobate", "g": "f" }, … } }`.
   Dans les indices, `"who": "role:acrobate"` ou `"other": "role:acrobate"`.
 
@@ -111,6 +114,15 @@ sw.js, manifest.json      PWA
 | `dir_person`         | `other`, `dir` (n,s,e,w,ne…), `exact`    | Cecily était exactement quatre lignes au sud d'Eddie. |
 | `dir_object`         | `object`, `dir`, `exact`, `sameRoom`     | Clarence était au sud-ouest d'une TV, dans la même pièce. |
 | `col_has`            | `object`, `otherRoom` ou `sameRoom`      | Il y avait une TV dans la colonne de Benjamin, dans une autre pièce. |
+| `in_rooms` / `only_in_rooms` | `rooms` (liste)                 | Aria était la seule personne dans des toilettes. |
+| `only_not_on`        | `object`                                 | Evangeline était debout ; tous les autres étaient dans un fauteuil. |
+| `not_col_has`        | `object`                                 | Il n'y avait pas de carton dans la colonne d'Eli. |
+| `someone_in_room`    | `on`, `next_to`, `not_next_to` (liste), `gender` | Quelqu'un d'autre était assis dans le fauteuil de sa pièce. |
+| `someone_offset`     | `dCol` ou `dRow`, mêmes conditions       | À une colonne à l'est d'Alice, quelqu'un était à côté d'une plante. |
+| `room_all_tag`       | `tag` (personnes : `tags`)               | Toutes les personnes de sa pièce portaient des lunettes. |
+| `easternmost_standing` | `object` (ce qui compte comme assis)   | La personne debout la plus à l'est de sa pièce. |
+| `count_in_room`      | `count`, mêmes conditions                | Deux hommes de sa pièce étaient à côté d'une étagère. |
+| `room_composition`   | `m`, `f`                                 | Il y avait un autre homme et une femme dans sa pièce. |
 | `alone_with_gender`  | `gender`                                 | Gavin était seul avec une femme (une seule autre personne dans sa pièce). |
 | `col_has_exclusive`  | `object`                                 | Il y avait un tonneau dans la colonne d'Eddie. Toutes les autres colonnes avec un tonneau étaient vides. |
 | `adjacent_col_empty` | `dir` (e/w)                              | La colonne directement à l'est de Brenda était vide. |

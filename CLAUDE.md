@@ -47,7 +47,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 ## À faire / ouvert
 
 - Transcrire le reste du livre (Julien envoie les photos des pages, les solutions au crayon de sa sœur servent de contrôle). Ses deux sœurs ont le livre.
-- Faire vérifier par la sœur les coupables trouvés par le solveur dans les solutions du livre : affaire 30 = Albert, 31 = Bella, 75 = Arnold (rôles : Brenda acrobate, Daniel lanceur, Cecily dompteuse). Les affaires 1 à 20 sont transcrites et le solveur retrouve les coupables de la sœur (12 : non noté par elle, solveur = Greg ; il a fallu compter la baignoire de la salle de bains comme non occupable, à confirmer sur le livre).
+- Faire vérifier par la sœur les coupables trouvés par le solveur dans les solutions du livre : affaire 30 = Albert, 31 = Bella, 75 = Arnold (rôles : Brenda acrobate, Daniel lanceur, Cecily dompteuse). Les affaires 1 à 29 sont transcrites, toutes à solution unique. Coupables non confirmés par la sœur : 12 Greg, 26 Adeline (ses notes divergent), 28 Edison (ses notes divergent), 29 Beckie (non résolue).
 - Une étiquette de pièce chevauche parfois un objet de la pièce du dessous (affaire 8 : « Terrasse » sur la TV).
 - Lion et cheval sont encore en emoji : à dessiner.
 - Pas encore de générateur de grilles (seulement `--suggest` pour les indices).
