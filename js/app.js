@@ -53,10 +53,10 @@ async function loadCatalog() {
 
 // ---------- Affaires privées (grilles du livre) ----------
 // En local, les fichiers en clair de puzzles/livre/. En ligne, seulement leur version chiffrée,
-// ouverte par mot de passe (lien « ?livre ») ; le téléphone garde ensuite la clé.
+// ouverte par mot de passe (petit lien en bas de l'accueil) ; l'appareil garde ensuite la clé.
 let vault = null;          // contenu de puzzles/livre.enc.json
 let vaultOpen = false;
-const WANT_VAULT = new URLSearchParams(location.search).has('livre');
+let showVault = new URLSearchParams(location.search).has('livre');
 
 async function privateCases() {
   try {
@@ -87,8 +87,8 @@ async function privateCases() {
 }
 
 function renderVault() {
-  const form = $('#vault');
-  form.hidden = !(WANT_VAULT && vault);
+  $('#vault-toggle').hidden = !vault || showVault;
+  $('#vault').hidden = !(showVault && vault);
   $('#vault-ask').hidden = vaultOpen;
   $('#vault-done').hidden = !vaultOpen;
 }
@@ -110,6 +110,12 @@ $('#vault').addEventListener('submit', async e => {
   } catch {
     msg.textContent = 'Mot de passe incorrect.';
   }
+});
+
+$('#vault-toggle').addEventListener('click', () => {
+  showVault = true;
+  renderVault();
+  if (!vaultOpen) $('#vault-pass').focus();
 });
 
 $('#vault-lock').addEventListener('click', () => {

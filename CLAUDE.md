@@ -19,7 +19,7 @@ Idée à plus long terme : proposer une version mobile à l'auteur. D'où la rè
 - `js/vault.js` : chiffrement des affaires privées (AES-GCM, clé PBKDF2), partagé navigateur et node.
 - `tools/check.mjs` : `node tools/check.mjs puzzles/X.json` vérifie que la solution est unique. `--suggest [--seed=N]` propose un jeu d'indices minimal.
 - `puzzles/` : grilles originales. `puzzles/livre/` : grilles recopiées du livre, **usage privé, ignorées par git, ne jamais les publier en clair**.
-- `puzzles/livre.enc.json` : ces mêmes grilles chiffrées (décision de Julien, pour un usage familial). Seul ce fichier est publié. Régénérer avec `HC_PASSWORD='…' node tools/encrypt.mjs` après tout ajout dans `puzzles/livre/`. **Le mot de passe n'est jamais écrit dans le dépôt** (ni code, ni commit, ni doc) ; Julien le garde. Dans l'app : lien `?livre`, le téléphone garde ensuite la clé.
+- `puzzles/livre.enc.json` : ces mêmes grilles chiffrées (décision de Julien, pour un usage familial). Seul ce fichier est publié. Régénérer avec `HC_PASSWORD='…' node tools/encrypt.mjs` après tout ajout dans `puzzles/livre/`. **Le mot de passe n'est jamais écrit dans le dépôt** (ni code, ni commit, ni doc) ; Julien le garde. Dans l'app : petit lien « Affaires privées » en bas de l'accueil (ou `?livre`), l'appareil garde ensuite la clé. Sœurs : app installée sur l'écran d'accueil, donc pas de lien à taper.
 - `README.md` : format JSON complet des grilles et liste des types d'indices.
 
 ## Règles du jeu (validées contre les grilles du livre)
