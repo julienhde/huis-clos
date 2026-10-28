@@ -86,6 +86,8 @@ sw.js, manifest.json      PWA
 - `people` : `g` (`f`/`m`) accorde les phrases, `hue` colore le jeton. `victim` : id de la victime.
 - `theme` (facultatif) : thème visuel par défaut de l'affaire (`manoir`, `chateau`, `cyberpunk`). Le joueur peut l'imposer partout via le réglage « Thème » ; sur « Auto », c'est celui de l'affaire qui s'applique.
 - Pièces : le sol et parfois la teinte se déduisent du nom (`FLOOR_RULES` dans `js/art.js` : la mer est de l'eau bleue, les douches un carrelage bleu clair…). `floor` (facultatif) force le type de sol et garde alors la teinte `hue` de la grille (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
+- Voitures : `voiture` (occupable, 2 cases) plus `arriere` (case arrière, invisible, à l'ouest : dans le livre l'avant est à droite) pour « à l'arrière d'une voiture ».
+- Les conditions de `someone_in_room`, `someone_offset`, `count_in_room`, `room_all` : `on`, `next_to`, `not_next_to` (liste), `gender`, `tag`, `corner`.
 - `alone` accepte `rooms` (seule dans l'une de ces pièces) ; `not_next_to` accepte `objects` (aucun de ces objets).
 - Un indice avec `"text": ""` n'est pas affiché : sa condition est déjà dite par la phrase de l'indice précédent.
 - `rules` : règles globales, ex. `["no_empty_room"]`, `{ "type": "only_one_on", "object": "lit" }` (« Une seule personne était sur un lit. ») ou
@@ -123,6 +125,12 @@ sw.js, manifest.json      PWA
 | `easternmost_standing` | `object` (ce qui compte comme assis)   | La personne debout la plus à l'est de sa pièce. |
 | `count_in_room`      | `count`, mêmes conditions                | Deux hommes de sa pièce étaient à côté d'une étagère. |
 | `room_composition`   | `m`, `f`                                 | Il y avait un autre homme et une femme dans sa pièce. |
+| `row_has`            | `object`, `sameRoom`                     | Il y avait une TV dans la ligne d'Aubrey, dans la même pièce. |
+| `only_next_to`       | `object`                                 | Aaliyah était la seule personne à côté d'une étagère. |
+| `easternmost_col`    | —                                        | Dans la colonne la plus à droite de sa pièce. |
+| `same_diagonal`      | `others` (liste)                         | Efim était sur la même diagonale qu'Anatoly ou que Boris. |
+| `shared_next_to`     | `object`                                 | À côté d'une TV ; quelqu'un d'autre était à côté de cette même TV. |
+| `room_all`           | mêmes conditions que `someone_in_room`   | Toutes les personnes de sa pièce étaient sur un lit. |
 | `alone_with_gender`  | `gender`                                 | Gavin était seul avec une femme (une seule autre personne dans sa pièce). |
 | `col_has_exclusive`  | `object`                                 | Il y avait un tonneau dans la colonne d'Eddie. Toutes les autres colonnes avec un tonneau étaient vides. |
 | `adjacent_col_empty` | `dir` (e/w)                              | La colonne directement à l'est de Brenda était vide. |

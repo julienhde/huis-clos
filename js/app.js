@@ -201,7 +201,7 @@ function renderLegend() {
   const theme = themeOf(g);
   const legend = $('#obj-legend');
   legend.className = `obj-legend t-${theme}`;
-  const present = [...new Set(g.instances.map(i => i.type))];
+  const present = [...new Set(g.instances.map(i => i.type))].filter(t => !g.types[t].hidden);
   legend.replaceChildren();
   for (const [ok, title] of [[true, 'Occupables'], [false, 'Non occupables']]) {
     const types = present.filter(t => g.types[t].occupiable === ok);
@@ -433,7 +433,7 @@ function renderBoard(popKey = null, nopeKey = null) {
     } else {
       const svg = objectSvg(inst.type, theme);
       if (svg) { el.className = `ob ob-art ob-${inst.type}`; el.innerHTML = svg; }
-      else if (def.icon) { el.className = 'ob ob-emoji'; el.textContent = def.icon; }
+      else if (def.icon) { el.className = `ob ob-emoji ob-${inst.type}`; el.textContent = def.icon; }
       else continue;
     }
     if (b.rect) els.push(place(el, b.r0, b.c0, b.h, b.w));

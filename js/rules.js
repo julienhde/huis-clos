@@ -26,6 +26,11 @@ export const OBJECTS = {
   statue:   { label: 'Statue',   icon: '🗿', occupiable: false, single: true, un: 'une statue',  de: "d'une statue" },
   casier:   { label: 'Casier',   icon: '🗄️', occupiable: false, single: true, un: 'un casier',   de: "d'un casier" },
   sac:      { label: 'Sac de frappe', icon: '🥊', occupiable: false, single: true, un: 'un sac de frappe', de: "d'un sac de frappe" },
+  voiture:  { label: 'Voiture',  icon: '🚗', occupiable: true,  un: 'une voiture', sur: 'dans une voiture', de: "d'une voiture" },
+  // Case arrière d'une voiture (à l'ouest : dans le livre l'avant est à droite). Invisible, sert aux indices.
+  arriere:  { label: 'Arrière de voiture', occupiable: true, hidden: true, un: "l'arrière d'une voiture", sur: "à l'arrière d'une voiture", de: "de l'arrière d'une voiture" },
+  tache:    { label: "Tache d'essence", icon: '💧', occupiable: true, single: true, un: "une tache d'essence", sur: "sur une tache d'essence", de: "d'une tache d'essence" },
+  pompe:    { label: 'Pompe à essence', icon: '⛽', occupiable: false, single: true, un: 'une pompe à essence', de: "d'une pompe à essence" },
   caisse:   { label: 'Caisse enregistreuse', icon: '🧾', occupiable: false, single: true, un: 'une caisse enregistreuse', de: "d'une caisse enregistreuse" },
 };
 
@@ -166,14 +171,17 @@ const matches = (g, cond, id, [r, c]) =>
   (!cond.on || g.has(r, c, cond.on))
   && (!cond.next_to || neighbors(g, r, c).some(([rr, cc]) => g.has(rr, cc, cond.next_to)))
   && (!cond.not_next_to || !neighbors(g, r, c).some(([rr, cc]) => cond.not_next_to.some(t => g.has(rr, cc, t))))
-  && (!cond.gender || g.byId[id].g === cond.gender);
+  && (!cond.gender || g.byId[id].g === cond.gender)
+  && (!cond.tag || (g.byId[id].tags ?? []).includes(cond.tag))
+  && (!cond.corner || isRoomCorner(g, r, c));
 const colEmpty = (pos, col, except) => Object.entries(pos).every(([id, [, c]]) => id === except || c !== col);
 
 // ---------------------------------------------------------------- indices
 
 /** Indices qui ne dépendent que de la position de la personne (servent à élaguer). */
 const UNARY = new Set(['on', 'not_on', 'next_to', 'not_next_to', 'window', 'in_room', 'not_in_room', 'room_has',
-  'row', 'col', 'corner', 'dir_object', 'col_has', 'next_to_wall', 'not_next_to_wall', 'in_rooms', 'not_col_has']);
+  'row', 'col', 'corner', 'dir_object', 'col_has', 'next_to_wall', 'not_next_to_wall', 'in_rooms', 'not_col_has',
+  'row_has', 'easternmost_col']);
 
 /**
  * Évalue un indice. Avec `partial`, `pos` peut être incomplet : on ne renvoie faux
@@ -210,6 +218,29 @@ export function checkClue(g, clue, pos, partial = false) {
     case 'col_has':     return (g.cellsOf[clue.object] ?? []).some(([rr, cc]) => cc === c
                           && (!clue.otherRoom || g.roomAt(rr, cc) !== g.roomAt(r, c))
                           && (!clue.sameRoom || g.roomAt(rr, cc) === g.roomAt(r, c)));
+    case 'row_has':     return (g.cellsOf[clue.object] ?? []).some(([rr, cc]) => rr === r
+                          && (!clue.sameRoom || g.roomAt(rr, cc) === g.roomAt(r, c)));
+    // Dans la colonne la plus à l'est de sa pièce.
+    case 'easternmost_col': {
+      for (let rr = 0; rr < g.rows; rr++) for (let cc = c + 1; cc < g.cols; cc++) if (g.roomAt(rr, cc) === g.roomAt(r, c)) return false;
+      return true;
+    }
+    case 'only_next_to': return neighbors(g, r, c).some(([rr, cc]) => g.has(rr, cc, clue.object))
+                          && others(pos, clue.who).every(o => !neighbors(g, ...pos[o]).some(([rr, cc]) => g.has(rr, cc, clue.object)));
+    // Sur la même diagonale que l'une des personnes citées.
+    case 'same_diagonal': {
+      const placed = clue.others.filter(o => pos[o]);
+      if (placed.length < clue.others.length && partial) return true;
+      return placed.some(o => Math.abs(pos[o][0] - r) === Math.abs(pos[o][1] - c));
+    }
+    // À côté d'un objet (une case) à côté duquel se trouve aussi quelqu'un d'autre.
+    case 'shared_next_to':
+      return neighbors(g, r, c).filter(([rr, cc]) => g.has(rr, cc, clue.object)).some(([tr, tc]) =>
+          others(pos, clue.who).some(o => neighbors(g, tr, tc).some(([rr, cc]) => rr === pos[o][0] && cc === pos[o][1])))
+        || (partial && Object.keys(pos).length < g.people.length);
+    // Tous les autres occupants de sa pièce remplissent les conditions (sur un lit…).
+    case 'room_all':
+      return othersInRoom(g, pos, clue.who).every(o => matches(g, clue, o, pos[o]));
     case 'not_col_has': return !(g.cellsOf[clue.object] ?? []).some(([, cc]) => cc === c);
     case 'col_has_exclusive': {
       const cols = new Set((g.cellsOf[clue.object] ?? []).map(([, cc]) => cc));
@@ -323,6 +354,7 @@ function solveFixed(g, clues, limit, out) {
     const unary = clues.filter(cl => cl.who === id && UNARY.has(cl.type))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'only_on').map(cl => ({ ...cl, type: 'on' })))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'only_window').map(cl => ({ ...cl, type: 'window' })))
+      .concat(clues.filter(cl => cl.who === id && cl.type === 'only_next_to').map(cl => ({ ...cl, type: 'next_to' })))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'col_has_exclusive').map(cl => ({ ...cl, type: 'col_has' })))
       .concat(clues.filter(cl => cl.who === id && cl.type === 'alone' && cl.room !== undefined).map(cl => ({ who: id, type: 'in_room', room: cl.room })))
       .concat(clues.filter(cl => cl.who === id && (cl.type === 'only_in_rooms' || (cl.type === 'alone' && cl.rooms))).map(cl => ({ who: id, type: 'in_rooms', rooms: cl.rooms })))
@@ -442,6 +474,12 @@ export function clueText(g, clue) {
         : clue.room === undefined ? `${n} était ${seul}.` : `${n} était ${seul} ${room(clue.room).dans}.`;
       case 'someone_in_room': return `Il y avait quelqu'un d'autre dans la pièce ${de(n)} qui remplissait cette condition.`;
       case 'someone_offset':  return `Quelqu'un ${clue.dCol !== undefined ? 'dans la colonne voisine' : 'dans la ligne voisine'} ${de(n)} remplissait cette condition.`;
+      case 'row_has':     return `Il y avait ${O.un} dans la ligne ${de(n)}${clue.sameRoom ? ', dans la même pièce' : ''}.`;
+      case 'easternmost_col': return `${n} était dans la colonne la plus à l'est de sa pièce.`;
+      case 'only_next_to': return `${n} était la seule personne à côté ${O.de}.`;
+      case 'same_diagonal': return `${n} était sur la même diagonale que ${clue.others.map(o => subject(g, o).name).join(' ou ')}.`;
+      case 'shared_next_to': return `${n} était à côté ${O.de}. Quelqu'un d'autre était à côté de ce même objet.`;
+      case 'room_all':    return `Toutes les autres personnes de la pièce ${de(n)} remplissaient cette condition.`;
       case 'room_all_tag':    return `Toutes les personnes dans la pièce ${de(n)} avaient : ${clue.tag}.`;
       case 'easternmost_standing': return `${n} était la personne debout la plus à l'est de sa pièce.`;
       case 'count_in_room':   return `Il y avait ${NUMBERS[clue.count]} personnes de ce genre dans la pièce ${de(n)}.`;

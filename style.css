@@ -351,6 +351,8 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px 
 }
 
 .cell { -webkit-touch-callout: none; }
+/* L'emoji voiture regarde à gauche ; dans le livre l'avant est à droite (l'arrière, à gauche, compte pour les indices). */
+.ob-voiture { transform: scaleX(-1); }
 .cell.pop .token { animation: pop .18s ease-out; }
 @keyframes pop { from { transform: scale(.6); } to { transform: scale(1); } }
 .cell.nope { animation: nope .28s; }
