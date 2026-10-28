@@ -17,8 +17,8 @@ const FLOOR_RULES = [
   [/rue\b|ruelle|parking|pompes|station/i, 'concrete', 220],
   [/couloir|pizzeria|tournoi|activités|hall|gym|entraînement|magasin|caisses|comptoir|rayon|goûters|boissons|viande|boulangerie|fruits|ordinateurs|loisirs|boutique|piste de danse/i, 'checker', null],
   [/cuisine|bains|toilettes|entrée|accueil|ascenseur|buanderie|cellier|salle de pause|vestiaire/i, 'tiles', null],
-  [/gradins|balcon|parterre|orchestre|loge|cinéma|théâtre|classe|cockpit|vip|cabine|salle d'attente|projection|salle commune|bar\b|galerie|bureau|interrogatoire/i, 'carpet', null],
-  [/démolition|chantier|garage|cave|entrepôt|sous-sol|débarras|réserve|cellule|pièces à conviction|réparations/i, 'concrete', null],
+  [/gradins|balcon|parterre|orchestre|loge|cinéma|théâtre|classe|cockpit|vip|cabine|salle d'attente|projection|réunion|conférence|open space|antichambre|contrôle|séjour|salle commune|bar\b|galerie|bureau|interrogatoire/i, 'carpet', null],
+  [/démolition|chantier|garage|cave|entrepôt|sous-sol|débarras|réserve|cellule|pièces à conviction|réparations|chambre forte/i, 'concrete', null],
   [/^piste$|scène|ring/i, 'stage', null],
   [/coulisses|centre d'appel/i, 'concrete', null],
 ];

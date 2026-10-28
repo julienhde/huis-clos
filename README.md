@@ -96,7 +96,9 @@ sw.js, manifest.json      PWA
   Aussi : `count_on` (`object`, `count` : au total, N personnes sur l'objet), `at_least_one_on` (`object`),
   `distinct_counts` (`rooms` : un nombre différent de personnes dans chacune).
   `one_on_per_room` (`object` : exactement une personne sur cet objet dans chaque pièce qui en a).
-  `none_next_to` (`object`, `gender` facultatif : aucune femme à côté d'une table), `distinct_rooms` (`people` : dans des pièces différentes). `"text": ""` masque une règle déjà dite par un indice.
+  `none_next_to` (`object`, `gender` facultatif : aucune femme à côté d'une table), `distinct_rooms` (`people` : dans des pièces différentes).
+  `instances_occupied` (`object`, `missing` : tous les lits sauf un occupés), `count_next_to` (`object`, `count`).
+- `row` accepte `rows` (liste) ; `someone_in_room` accepte `dir` (l'autre personne est au sud… de lui). `"text": ""` masque une règle déjà dite par un indice.
 - `roles` (rôles inconnus) : `{ "candidates": ["B","C","D"], "list": { "acrobate": { "label": "l'acrobate", "g": "f" }, … } }`.
   Dans les indices, `"who": "role:acrobate"` ou `"other": "role:acrobate"`.
 
@@ -139,6 +141,11 @@ sw.js, manifest.json      PWA
 | `next_to` avec `dirs` / `objects` | `dirs` (liste n,s,e,w : où est l'objet) ; `objects` (l'un d'eux) | Claire était à côté d'un lit, au nord ou au sud de celui-ci. |
 | `not_window`         | —                                        | Hope n'était pas devant une fenêtre. |
 | `top_row_of_room`    | —                                        | Barbara était dans la ligne du haut de sa pièce. |
+| `not_room_has`       | `object`                                 | Il n'y avait pas de TV dans sa pièce. |
+| `center_of_room`     | —                                        | Hope était dans la case centrale de sa pièce. |
+| `next_to_empty_room` | —                                        | Anna était directement à côté d'une pièce vide. |
+| `room_south_occupied`| —                                        | La pièce directement au sud de Dan était occupée. |
+| `someone`            | mêmes conditions que `someone_in_room`   | … tout comme une femme (n'importe où). |
 | `bottom_row_of_room` | —                                        | Delia était dans la ligne du bas de sa pièce. |
 | `line_has`           | `object`, `sameRoom`                     | Même ligne ou même colonne que la TV. |
 | `someone_other_room` | mêmes conditions que `someone_in_room`   | Comme une femme dans une autre pièce. |
