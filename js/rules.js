@@ -34,6 +34,7 @@ export const OBJECTS = {
   catapulte: { label: 'Catapulte', icon: '🪨', occupiable: false, single: true, un: 'une catapulte', de: "d'une catapulte" },
   vase:     { label: 'Vase',     icon: '🏺', occupiable: false, single: true, un: 'un vase',     de: "d'un vase" },
   serviette: { label: 'Serviette', shape: 'rug', occupiable: true, un: 'une serviette', sur: 'sur une serviette', de: "d'une serviette" },
+  caissebois: { label: 'Caisse', icon: '🪵', occupiable: false, single: true, un: 'une caisse', de: "d'une caisse" },
   arbre:    { label: 'Arbre',    icon: '🌲', occupiable: false, single: true, un: 'un arbre',    de: "d'un arbre" },
   caisse:   { label: 'Caisse enregistreuse', icon: '🧾', occupiable: false, single: true, un: 'une caisse enregistreuse', de: "d'une caisse enregistreuse" },
 };
@@ -48,6 +49,8 @@ export function ruleText(g, rule) {
   if (rule.text !== undefined) return rule.text; // "" : déjà dite par un indice
   if (rule.type === 'only_one_on') return `Une seule personne était ${g.types[rule.object].sur}.`;
   if (rule.type === 'one_on_per_room') return `Exactement une personne était ${g.types[rule.object].sur} dans chaque pièce.`;
+  if (rule.type === 'none_next_to') return `Aucune ${rule.gender === 'f' ? 'femme' : 'personne'} n'était à côté ${g.types[rule.object].de}.`;
+  if (rule.type === 'distinct_rooms') return `${rule.people.map(id => g.byId[id].name).join(', ')} étaient dans des pièces différentes.`;
   if (rule.type === 'count_on') return `Au total, ${NUMBERS[rule.count]} personnes étaient ${g.types[rule.object].sur}.`;
   if (rule.type === 'at_least_one_on') return `Au moins une personne était ${g.types[rule.object].sur}.`;
   if (rule.type === 'distinct_counts') return `Il y avait un nombre différent de personnes dans chacune de ces pièces : ${rule.rooms.map(i => g.rooms[i].name).join(', ')}.`;
@@ -180,6 +183,7 @@ const matches = (g, cond, id, [r, c], pos = {}) =>
   && (!cond.next_to || neighbors(g, r, c).some(([rr, cc]) => g.has(rr, cc, cond.next_to)))
   && (!cond.not_next_to || !neighbors(g, r, c).some(([rr, cc]) => cond.not_next_to.some(t => g.has(rr, cc, t))))
   && (!cond.gender || g.byId[id].g === cond.gender)
+  && (!cond.suspect || id !== g.victim)
   && (!cond.tag || (g.byId[id].tags ?? []).includes(cond.tag))
   && (!cond.corner || isRoomCorner(g, r, c))
   && (!cond.window || g.windowCells.has(key(r, c)))
@@ -192,7 +196,7 @@ const colEmpty = (pos, col, except) => Object.entries(pos).every(([id, [, c]]) =
 /** Indices qui ne dépendent que de la position de la personne (servent à élaguer). */
 const UNARY = new Set(['on', 'not_on', 'next_to', 'not_next_to', 'window', 'in_room', 'not_in_room', 'room_has',
   'row', 'col', 'corner', 'dir_object', 'col_has', 'next_to_wall', 'not_next_to_wall', 'in_rooms', 'not_col_has',
-  'row_has', 'easternmost_col', 'bottom_row_of_room', 'line_has', 'not_window']);
+  'row_has', 'easternmost_col', 'bottom_row_of_room', 'line_has', 'not_window', 'top_row_of_room']);
 
 /**
  * Évalue un indice. Avec `partial`, `pos` peut être incomplet : on ne renvoie faux
@@ -232,6 +236,11 @@ export function checkClue(g, clue, pos, partial = false) {
     case 'col_has':     return (g.cellsOf[clue.object] ?? []).some(([rr, cc]) => cc === c
                           && (!clue.otherRoom || g.roomAt(rr, cc) !== g.roomAt(r, c))
                           && (!clue.sameRoom || g.roomAt(rr, cc) === g.roomAt(r, c)));
+    // Dans la ligne du haut de sa pièce.
+    case 'top_row_of_room': {
+      for (let rr = 0; rr < r; rr++) for (let cc = 0; cc < g.cols; cc++) if (g.roomAt(rr, cc) === g.roomAt(r, c)) return false;
+      return true;
+    }
     // Dans la ligne du bas de sa pièce.
     case 'bottom_row_of_room': {
       for (let rr = r + 1; rr < g.rows; rr++) for (let cc = 0; cc < g.cols; cc++) if (g.roomAt(rr, cc) === g.roomAt(r, c)) return false;
@@ -334,6 +343,14 @@ export function checkGlobal(g, rule, pos) {
   if (rule.type === 'one_on_per_room') {
     return g.rooms.every((_, i) => !g.roomObjects[i].has(rule.object)
       || Object.values(pos).filter(([r, c]) => g.roomAt(r, c) === i && g.has(r, c, rule.object)).length === 1);
+  }
+  if (rule.type === 'none_next_to') {
+    return Object.entries(pos).every(([id, [r, c]]) => (rule.gender && g.byId[id].g !== rule.gender)
+      || !neighbors(g, r, c).some(([rr, cc]) => g.has(rr, cc, rule.object)));
+  }
+  if (rule.type === 'distinct_rooms') {
+    const rooms = rule.people.map(id => g.roomAt(...pos[id]));
+    return new Set(rooms).size === rooms.length;
   }
   if (rule.type === 'count_on') {
     return Object.values(pos).filter(([r, c]) => g.has(r, c, rule.object)).length === rule.count;
@@ -515,6 +532,7 @@ export function clueText(g, clue) {
         : clue.room === undefined ? `${n} était ${seul}.` : `${n} était ${seul} ${room(clue.room).dans}.`;
       case 'someone_in_room': return `Il y avait quelqu'un d'autre dans la pièce ${de(n)} qui remplissait cette condition.`;
       case 'someone_offset':  return `Quelqu'un ${clue.dCol !== undefined ? 'dans la colonne voisine' : 'dans la ligne voisine'} ${de(n)} remplissait cette condition.`;
+      case 'top_row_of_room': return `${n} était dans la ligne du haut de sa pièce.`;
       case 'bottom_row_of_room': return `${n} était dans la ligne du bas de sa pièce.`;
       case 'line_has':    return `${n} était dans la même ligne ou colonne ${O.de}.`;
       case 'someone_other_room': return `Quelqu'un dans une autre pièce que ${n} remplissait cette condition.`;

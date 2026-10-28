@@ -87,7 +87,7 @@ sw.js, manifest.json      PWA
 - `theme` (facultatif) : thème visuel par défaut de l'affaire (`manoir`, `chateau`, `cyberpunk`). Le joueur peut l'imposer partout via le réglage « Thème » ; sur « Auto », c'est celui de l'affaire qui s'applique.
 - Pièces : le sol et parfois la teinte se déduisent du nom (`FLOOR_RULES` dans `js/art.js` : la mer est de l'eau bleue, les douches un carrelage bleu clair…). `floor` (facultatif) force le type de sol et garde alors la teinte `hue` de la grille (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
 - Voitures : `voiture` (occupable, 2 cases) plus `arriere` (case arrière, invisible, à l'ouest : dans le livre l'avant est à droite) pour « à l'arrière d'une voiture ».
-- Les conditions de `someone_in_room`, `someone_offset`, `count_in_room`, `room_all`, `someone_other_room` : `on`, `next_to`, `not_next_to` (liste), `gender`, `tag`, `corner`, `window`, `row_has` (objet dans sa ligne et sa pièce), `alone` (seule dans sa pièce).
+- Les conditions de `someone_in_room`, `someone_offset`, `count_in_room`, `room_all`, `someone_other_room` : `on`, `next_to`, `not_next_to` (liste), `gender`, `tag`, `corner`, `window`, `row_has` (objet dans sa ligne et sa pièce), `alone` (seule dans sa pièce), `suspect` (pas la victime).
 - `on` accepte `objects` (« dans un fauteuil ou sur un lit »).
 - `alone` accepte `rooms` (seule dans l'une de ces pièces) ; `not_next_to` accepte `objects` (aucun de ces objets).
 - Un indice avec `"text": ""` n'est pas affiché : sa condition est déjà dite par la phrase de l'indice précédent.
@@ -95,7 +95,8 @@ sw.js, manifest.json      PWA
   `{ "type": "empty_rooms", "rooms": [0, 1, 2], "count": 2 }` (exactement deux de ces pièces vides). `text` facultatif.
   Aussi : `count_on` (`object`, `count` : au total, N personnes sur l'objet), `at_least_one_on` (`object`),
   `distinct_counts` (`rooms` : un nombre différent de personnes dans chacune).
-  `one_on_per_room` (`object` : exactement une personne sur cet objet dans chaque pièce qui en a). `"text": ""` masque une règle déjà dite par un indice.
+  `one_on_per_room` (`object` : exactement une personne sur cet objet dans chaque pièce qui en a).
+  `none_next_to` (`object`, `gender` facultatif : aucune femme à côté d'une table), `distinct_rooms` (`people` : dans des pièces différentes). `"text": ""` masque une règle déjà dite par un indice.
 - `roles` (rôles inconnus) : `{ "candidates": ["B","C","D"], "list": { "acrobate": { "label": "l'acrobate", "g": "f" }, … } }`.
   Dans les indices, `"who": "role:acrobate"` ou `"other": "role:acrobate"`.
 
@@ -137,6 +138,7 @@ sw.js, manifest.json      PWA
 | `room_all`           | mêmes conditions que `someone_in_room`   | Toutes les personnes de sa pièce étaient sur un lit. |
 | `next_to` avec `dirs` / `objects` | `dirs` (liste n,s,e,w : où est l'objet) ; `objects` (l'un d'eux) | Claire était à côté d'un lit, au nord ou au sud de celui-ci. |
 | `not_window`         | —                                        | Hope n'était pas devant une fenêtre. |
+| `top_row_of_room`    | —                                        | Barbara était dans la ligne du haut de sa pièce. |
 | `bottom_row_of_room` | —                                        | Delia était dans la ligne du bas de sa pièce. |
 | `line_has`           | `object`, `sameRoom`                     | Même ligne ou même colonne que la TV. |
 | `someone_other_room` | mêmes conditions que `someone_in_room`   | Comme une femme dans une autre pièce. |
