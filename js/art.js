@@ -8,7 +8,7 @@
  */
 const FLOOR_RULES = [
   [/mer\b|océan|lac\b|rivière|piscine|bassin|fontaine|étang|jacuzzi/i, 'water', 200],
-  [/jardin|parc|pelouse|potager|prairie/i, 'grass', 110],
+  [/jardin|parc|pelouse|potager|prairie|bois\b|forêt/i, 'grass', 110],
   [/douche|décontamination|laboratoire|expérimentation/i, 'tiles', 190],
   [/chambre froide|surgelés|congélateur|frigo/i, 'tiles', 205],
   [/terrasse|écurie|grange|ponton|véranda|pont\b/i, 'deck', null],
@@ -16,7 +16,7 @@ const FLOOR_RULES = [
   [/rue\b|ruelle|parking|pompes|station/i, 'concrete', 220],
   [/couloir|pizzeria|tournoi|activités|hall|gym|entraînement|magasin|caisses|comptoir|rayon|goûters|boissons|viande|boulangerie|fruits|ordinateurs|loisirs/i, 'checker', null],
   [/cuisine|bains|toilettes|entrée|accueil|ascenseur|buanderie|cellier|salle de pause|vestiaire/i, 'tiles', null],
-  [/gradins|loge|cinéma|théâtre|classe|cockpit|vip|cabine|salle d'attente|salle commune|bar\b|galerie|bureau|interrogatoire/i, 'carpet', null],
+  [/gradins|loge|cinéma|théâtre|classe|cockpit|vip|cabine|salle d'attente|projection|salle commune|bar\b|galerie|bureau|interrogatoire/i, 'carpet', null],
   [/démolition|chantier|garage|cave|entrepôt|sous-sol|débarras|réserve|cellule|pièces à conviction|réparations/i, 'concrete', null],
   [/piste|scène|ring/i, 'stage', null],
 ];

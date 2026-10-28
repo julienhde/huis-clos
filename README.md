@@ -92,6 +92,8 @@ sw.js, manifest.json      PWA
 - Un indice avec `"text": ""` n'est pas affiché : sa condition est déjà dite par la phrase de l'indice précédent.
 - `rules` : règles globales, ex. `["no_empty_room"]`, `{ "type": "only_one_on", "object": "lit" }` (« Une seule personne était sur un lit. ») ou
   `{ "type": "empty_rooms", "rooms": [0, 1, 2], "count": 2 }` (exactement deux de ces pièces vides). `text` facultatif.
+  Aussi : `count_on` (`object`, `count` : au total, N personnes sur l'objet), `at_least_one_on` (`object`),
+  `distinct_counts` (`rooms` : un nombre différent de personnes dans chacune). `"text": ""` masque une règle déjà dite par un indice.
 - `roles` (rôles inconnus) : `{ "candidates": ["B","C","D"], "list": { "acrobate": { "label": "l'acrobate", "g": "f" }, … } }`.
   Dans les indices, `"who": "role:acrobate"` ou `"other": "role:acrobate"`.
 
@@ -131,6 +133,11 @@ sw.js, manifest.json      PWA
 | `same_diagonal`      | `others` (liste)                         | Efim était sur la même diagonale qu'Anatoly ou que Boris. |
 | `shared_next_to`     | `object`                                 | À côté d'une TV ; quelqu'un d'autre était à côté de cette même TV. |
 | `room_all`           | mêmes conditions que `someone_in_room`   | Toutes les personnes de sa pièce étaient sur un lit. |
+| `next_to` avec `dirs` / `objects` | `dirs` (liste n,s,e,w : où est l'objet) ; `objects` (l'un d'eux) | Claire était à côté d'un lit, au nord ou au sud de celui-ci. |
+| `not_window`         | —                                        | Hope n'était pas devant une fenêtre. |
+| `bottom_row_of_room` | —                                        | Delia était dans la ligne du bas de sa pièce. |
+| `line_has`           | `object`, `sameRoom`                     | Même ligne ou même colonne que la TV. |
+| `someone_other_room` | mêmes conditions que `someone_in_room`   | Comme une femme dans une autre pièce. |
 | `alone_with_gender`  | `gender`                                 | Gavin était seul avec une femme (une seule autre personne dans sa pièce). |
 | `col_has_exclusive`  | `object`                                 | Il y avait un tonneau dans la colonne d'Eddie. Toutes les autres colonnes avec un tonneau étaient vides. |
 | `adjacent_col_empty` | `dir` (e/w)                              | La colonne directement à l'est de Brenda était vide. |
