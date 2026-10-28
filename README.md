@@ -88,6 +88,7 @@ sw.js, manifest.json      PWA
 - Pièces : le sol et parfois la teinte se déduisent du nom (`FLOOR_RULES` dans `js/art.js` : la mer est de l'eau bleue, les douches un carrelage bleu clair…). `floor` (facultatif) force le type de sol et garde alors la teinte `hue` de la grille (`wood`, `tiles`, `checker`, `diamond`, `grass`, `deck`, `water`, `carpet`, `concrete`, `stage`), sinon il est déduit du nom.
 - Voitures : `voiture` (occupable, 2 cases) plus `arriere` (case arrière, invisible, à l'ouest : dans le livre l'avant est à droite) pour « à l'arrière d'une voiture ».
 - Les conditions de `someone_in_room`, `someone_offset`, `count_in_room`, `room_all`, `someone_other_room` : `on`, `next_to`, `not_next_to` (liste), `gender`, `tag`, `corner`, `window`, `row_has` (objet dans sa ligne et sa pièce), `alone` (seule dans sa pièce), `suspect` (pas la victime).
+- `col` et `row` acceptent `cols` / `rows` (listes). Conditions en plus : `room`, `not_on`, et `someone_offset` accepte `otherRoom`.
 - `on` accepte `objects` (« dans un fauteuil ou sur un lit »).
 - `alone` accepte `rooms` (seule dans l'une de ces pièces) ; `not_next_to` accepte `objects` (aucun de ces objets).
 - Un indice avec `"text": ""` n'est pas affiché : sa condition est déjà dite par la phrase de l'indice précédent.
@@ -146,6 +147,15 @@ sw.js, manifest.json      PWA
 | `next_to_empty_room` | —                                        | Anna était directement à côté d'une pièce vide. |
 | `room_south_occupied`| —                                        | La pièce directement au sud de Dan était occupée. |
 | `someone`            | mêmes conditions que `someone_in_room`   | … tout comme une femme (n'importe où). |
+| `door` / `not_door`  | — (grille : `doors`, comme `windows`)    | Cayla était à côté d'une porte. |
+| `next_to_room`       | `room`                                   | Contre un mur ; de l'autre côté, la cuisine. |
+| `highest_of_gender`  | `gender`                                 | Plus haut que tous les autres hommes. |
+| `adjacent_row_empty` | `dir` (n/s)                              | La ligne juste en dessous de lui était vide. |
+| `only_one_in_room`   | conditions                               | Seule personne de sa pièce à côté d'une citrouille. |
+| `next_to_empty_object` | `object`                               | À côté d'une voiture vide. |
+| `diff_zone`          | `other`, `zone` (liste de pièces)        | Pas toutes deux à l'intérieur ni toutes deux à l'extérieur. |
+| `same_team` / `not_same_team` / `others_split` | `split` (première colonne de la 2e équipe) | Équipes par colonnes (hockey). |
+| `grid_corner`, `not_col` (`cols`) | —                           | Dans l'un des quatre coins de la grille. |
 | `bottom_row_of_room` | —                                        | Delia était dans la ligne du bas de sa pièce. |
 | `line_has`           | `object`, `sameRoom`                     | Même ligne ou même colonne que la TV. |
 | `someone_other_room` | mêmes conditions que `someone_in_room`   | Comme une femme dans une autre pièce. |

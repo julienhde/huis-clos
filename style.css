@@ -318,6 +318,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px 
 .win.w, .win.e { top: 18%; bottom: 18%; width: 9px; }
 .win.n { top: -3px; } .win.s { bottom: -3px; }
 .win.w { left: -3px; } .win.e { right: -3px; }
+.win.door { background: #a0673a; }
 
 .token {
   position: relative; z-index: 3;

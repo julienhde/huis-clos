@@ -380,6 +380,11 @@ function renderBoard(popKey = null, nopeKey = null) {
           btn.append(Object.assign(document.createElement('span'), { className: `win ${w.side}` }));
         }
       }
+      for (const w of g.doors) {
+        if (w.cell[0] === r && w.cell[1] === c) {
+          btn.append(Object.assign(document.createElement('span'), { className: `win door ${w.side}` }));
+        }
+      }
       if (who) {
         const t = personDot(g.byId[who], 'token');
         if (rowCount[r] > 1 || colCount[c] > 1) t.classList.add('conflict');
@@ -406,6 +411,7 @@ function renderBoard(popKey = null, nopeKey = null) {
 
       const parts = [`${LETTERS[c]}${r + 1}`, g.rooms[room].name, ...objs.map(t => g.types[t].label)];
       if (g.windowCells.has(k)) parts.push('devant une fenêtre');
+      if (g.doorCells.has(k)) parts.push('à côté d’une porte');
       if (who) parts.push(g.byId[who].name);
       else if (marks.has(k)) parts.push('barrée');
       if (noted.length) parts.push(`annoté ${noted.map(id => g.byId[id].name).join(', ')}`);
